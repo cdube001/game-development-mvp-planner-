@@ -18,14 +18,15 @@ import streamlit as st
 
 #-----------Dataset Loading-----------------------------------------------------
 #establish paths for processed and clean data
-processed_path = "/content/drive/MyDrive/CS X456.02/Project Data/processed/"
-clean_path = "/content/drive/MyDrive/CS X456.02/Project Data/clean/"
-
+# processed_path = "/content/drive/MyDrive/CS X456.02/Project Data/processed/"
+# clean_path = "/content/drive/MyDrive/CS X456.02/Project Data/clean/"
+processed_path = "data/processed/"
+clean_path = "data/clean/"
 
 #Reading the steam store clean data
-Steam_Store_df = pd.read_parquet(clean_path+"steam_store_clean.parquet")
-Steam_Spy_df = pd.read_parquet(clean_path+"steamspy_apps_clean.parquet")
 
+Steam_Spy_df = pd.read_parquet(clean_path+"steamspy_apps_clean.parquet")
+Steam_Store_df = pd.read_parquet(clean_path+"steam_store_clean.parquet")
 
 #--------------Gemini Model-----------------------------------------------------
 api_key = os.getenv("GEMINI_API_KEY")
