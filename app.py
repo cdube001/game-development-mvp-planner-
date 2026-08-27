@@ -121,45 +121,61 @@ def load_embedding_data():
 
 @st.cache_resource
 def get_embedding_resources():
-    model = SentenceTransformer("BAAI/bge-base-en-v1.5")
+
+    model = load_embedding_model()
 
     (
-        about_df,
+        about_appids,
         about_matrix,
-        short_df,
+        short_appids,
         short_matrix
     ) = load_embedding_data()
 
-    return model, about_df, about_matrix, short_df, short_matrix
+    return (
+        model,
+        about_appids,
+        about_matrix,
+        short_appids,
+        short_matrix
+    )
 
 # Returning top 100 results based on semantic vector search
 # Semantic similarity captures conceptual relationships but may place substantial weight on named entities,
 # so community-generated tags were incorporated as an additional signal to emphasize gameplay characteristics.
 def top100semanticsearch(input_text):
 
-    (text_model, embedding_about_df, about_embedding_matrix, embedding_short_df, short_embedding_matrix) = get_embedding_resources()
+    (
+        text_model,
+        about_appids,
+        about_embedding_matrix,
+        short_appids,
+        short_embedding_matrix
+    ) = get_embedding_resources()
 
-    query_embedding = text_model.encode(input_text, convert_to_numpy=True)
-    
+    query_embedding = text_model.encode(
+        input_text,
+        convert_to_numpy=True
+    )
+
     # About This Game similarity
     about_this_game_similarity = cosine_similarity(
-        query_embedding,
+        query_embedding.reshape(1, -1),
         about_embedding_matrix
     )[0]
 
     combined_scores_df = pd.DataFrame({
-        "appid": embedding_about_df["appid"],
+        "appid": about_appids,
         "about_this_game_score": about_this_game_similarity,
     })
 
     # Short Description similarity
     short_description_similarity = cosine_similarity(
-        query_embedding,
+        query_embedding.reshape(1, -1),
         short_embedding_matrix
     )[0]
 
     short_scores = pd.DataFrame({
-        "appid": embedding_short_df["appid"],
+        "appid": short_appids,
         "short_description_score": short_description_similarity,
     })
 
