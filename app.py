@@ -10,6 +10,7 @@ import gc
 import os
 import re
 import json
+import requests
 
 
 from google import genai
