@@ -11,6 +11,7 @@ import os
 import re
 import json
 
+
 from google import genai
 # from google.colab import userdata
 
@@ -48,31 +49,66 @@ def load_embedding_model():
 @st.cache_resource
 def load_embedding_data():
 
-    embedding_about_this_game_df = pd.read_parquet(
-        hf_base_url + "embedded_about_this_game.parquet"
+    about_embeddings_path = "/tmp/about_this_game_embeddings.npy"
+    about_appids_path = "/tmp/about_this_game_appids.npy"
+
+    short_embeddings_path = "/tmp/short_description_embeddings.npy"
+    short_appids_path = "/tmp/short_description_appids.npy"
+
+    # Download About This Game embeddings
+    if not os.path.exists(about_embeddings_path):
+        response = requests.get(
+            hf_base_url + "about_this_game_embeddings.npy"
+        )
+        response.raise_for_status()
+
+        with open(about_embeddings_path, "wb") as f:
+            f.write(response.content)
+
+    # Download About This Game app IDs
+    if not os.path.exists(about_appids_path):
+        response = requests.get(
+            hf_base_url + "about_this_game_appids.npy"
+        )
+        response.raise_for_status()
+
+        with open(about_appids_path, "wb") as f:
+            f.write(response.content)
+
+    # Download Short Description embeddings
+    if not os.path.exists(short_embeddings_path):
+        response = requests.get(
+            hf_base_url + "short_description_embeddings.npy"
+        )
+        response.raise_for_status()
+
+        with open(short_embeddings_path, "wb") as f:
+            f.write(response.content)
+
+    # Download Short Description app IDs
+    if not os.path.exists(short_appids_path):
+        response = requests.get(
+            hf_base_url + "short_description_appids.npy"
+        )
+        response.raise_for_status()
+
+        with open(short_appids_path, "wb") as f:
+            f.write(response.content)
+
+    # Memory-map embeddings instead of loading them entirely into RAM
+    about_this_game_matrix = np.load(
+        about_embeddings_path,
+        mmap_mode="r"
     )
 
-    about_this_game_matrix = np.vstack(
-        embedding_about_this_game_df["about_this_game_embedding"].values
+    short_description_matrix = np.load(
+        short_embeddings_path,
+        mmap_mode="r"
     )
 
-    about_appids = embedding_about_this_game_df[["appid"]].copy()
-
-    del embedding_about_this_game_df
-    gc.collect()
-
-    embedding_short_description_df = pd.read_parquet(
-        hf_base_url + "embedded_short_description.parquet"
-    )
-
-    short_description_matrix = np.vstack(
-        embedding_short_description_df["short_description_embedding"].values
-    )
-
-    short_appids = embedding_short_description_df[["appid"]].copy()
-
-    del embedding_short_description_df
-    gc.collect()
+    # App IDs are small, so normal loading is fine
+    about_appids = np.load(about_appids_path)
+    short_appids = np.load(short_appids_path)
 
     return (
         about_appids,
@@ -80,7 +116,6 @@ def load_embedding_data():
         short_appids,
         short_description_matrix
     )
-
  
 
 @st.cache_resource
