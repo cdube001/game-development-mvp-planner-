@@ -47,20 +47,38 @@ def load_embedding_model():
 
 @st.cache_resource
 def load_embedding_data():
+
     embedding_about_this_game_df = pd.read_parquet(
         hf_base_url + "embedded_about_this_game.parquet"
-    )
-
-    embedding_short_description_df = pd.read_parquet(
-        hf_base_url + "embedded_short_description.parquet"
     )
 
     about_this_game_matrix = np.vstack(
         embedding_about_this_game_df["about_this_game_embedding"].values
     )
 
+    about_appids = embedding_about_this_game_df[["appid"]].copy()
+
+    del embedding_about_this_game_df
+    gc.collect()
+
+    embedding_short_description_df = pd.read_parquet(
+        hf_base_url + "embedded_short_description.parquet"
+    )
+
     short_description_matrix = np.vstack(
         embedding_short_description_df["short_description_embedding"].values
+    )
+
+    short_appids = embedding_short_description_df[["appid"]].copy()
+
+    del embedding_short_description_df
+    gc.collect()
+
+    return (
+        about_appids,
+        about_this_game_matrix,
+        short_appids,
+        short_description_matrix
     )
 
     return (
