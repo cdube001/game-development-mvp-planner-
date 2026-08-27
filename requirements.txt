@@ -1,7 +1,9 @@
 streamlit
 pandas
 numpy
-sentence-transformers
-scikit-learn
 pyarrow
+scikit-learn
+sentence-transformers
+torch
+torchvision
 google-genai
