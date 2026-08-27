@@ -12,7 +12,7 @@ import re
 import json
 
 from google import genai
-from google.colab import userdata
+# from google.colab import userdata
 
 import streamlit as st
 
