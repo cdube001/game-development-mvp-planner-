@@ -81,12 +81,7 @@ def load_embedding_data():
         short_description_matrix
     )
 
-    return (
-        embedding_about_this_game_df[["appid"]],
-        about_this_game_matrix,
-        embedding_short_description_df[["appid"]],
-        short_description_matrix
-    )
+ 
 
 @st.cache_resource
 def get_embedding_resources():
