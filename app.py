@@ -88,17 +88,28 @@ def load_embedding_data():
         short_description_matrix
     )
 
-text_model = load_embedding_model()
+@st.cache_resource
+def get_embedding_resources():
+    model = SentenceTransformer("BAAI/bge-base-en-v1.5")
 
-embedding_about_df, about_embedding_matrix, embedding_short_df, short_embedding_matrix = load_embedding_data()
+    (
+        about_df,
+        about_matrix,
+        short_df,
+        short_matrix
+    ) = load_embedding_data()
+
+    return model, about_df, about_matrix, short_df, short_matrix
 
 # Returning top 100 results based on semantic vector search
 # Semantic similarity captures conceptual relationships but may place substantial weight on named entities,
 # so community-generated tags were incorporated as an additional signal to emphasize gameplay characteristics.
 def top100semanticsearch(input_text):
 
-    query_embedding = text_model.encode(input_text)
+    (text_model, embedding_about_df, about_embedding_matrix, embedding_short_df, short_embedding_matrix) = get_embedding_resources()
 
+    query_embedding = text_model.encode(input_text, convert_to_numpy=True)
+    
     # About This Game similarity
     about_this_game_similarity = cosine_similarity(
         query_embedding,
