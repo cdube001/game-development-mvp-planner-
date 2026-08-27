@@ -27,10 +27,17 @@ hf_base_url = "https://huggingface.co/datasets/cdube001/steam-game-mvp-data/reso
 #Reading the steam store clean data
 
 Steam_Spy_df = pd.read_parquet(clean_path+"steamspy_apps_clean.parquet")
-Steam_Store_df = pd.read_parquet(hf_base_url+"steam_store_clean.parquet")
+
+@st.cache_data
+def load_steam_store():
+    return pd.read_parquet(
+        hf_base_url + "steam_store_clean.parquet"
+    )
+
+Steam_Store_df = load_steam_store()
 
 #--------------Gemini Model-----------------------------------------------------
-api_key = st.secrets("GEMINI_API_KEY")
+api_key = st.secrets["GEMINI_API_KEY"]
 client = genai.Client(api_key=api_key)
 
 #--------------Functions--------------------------------------------------------
@@ -38,67 +45,97 @@ client = genai.Client(api_key=api_key)
 def load_embedding_model():
     return SentenceTransformer("BAAI/bge-base-en-v1.5")
 
+@st.cache_resource
+def load_embedding_data():
+    embedding_about_this_game_df = pd.read_parquet(
+        hf_base_url + "embedded_about_this_game.parquet"
+    )
+
+    embedding_short_description_df = pd.read_parquet(
+        hf_base_url + "embedded_short_description.parquet"
+    )
+
+    about_this_game_matrix = np.vstack(
+        embedding_about_this_game_df["about_this_game_embedding"].values
+    )
+
+    short_description_matrix = np.vstack(
+        embedding_short_description_df["short_description_embedding"].values
+    )
+
+    return (
+        embedding_about_this_game_df[["appid"]],
+        about_this_game_matrix,
+        embedding_short_description_df[["appid"]],
+        short_description_matrix
+    )
+
 text_model = load_embedding_model()
+
+embedding_about_df, about_embedding_matrix, embedding_short_df, short_embedding_matrix = load_embedding_data()
 
 # Returning top 100 results based on semantic vector search
 # Semantic similarity captures conceptual relationships but may place substantial weight on named entities,
 # so community-generated tags were incorporated as an additional signal to emphasize gameplay characteristics.
 def top100semanticsearch(input_text):
 
-            query_embedding = text_model.encode(input_text)
+    query_embedding = text_model.encode(input_text)
 
-            #Loading Dataset containing vectors for 'about this game'
-            embedding_about_this_game_df = pd.read_parquet(hf_base_url+"embedded_about_this_game.parquet")
+    # About This Game similarity
+    about_this_game_similarity = cosine_similarity(
+        query_embedding,
+        about_embedding_matrix
+    )[0]
 
-            #Establishing Embedding Matrix for 'about this game'
-            embedding__about_this_game_matrix = np.vstack(
-                embedding_about_this_game_df["about_this_game_embedding"].values
-            )
+    combined_scores_df = pd.DataFrame({
+        "appid": embedding_about_df["appid"],
+        "about_this_game_score": about_this_game_similarity,
+    })
 
-            #cosine similarity matrix
-            about_this_game_similarity = cosine_similarity(query_embedding, embedding__about_this_game_matrix)[0]
+    # Short Description similarity
+    short_description_similarity = cosine_similarity(
+        query_embedding,
+        short_embedding_matrix
+    )[0]
 
+    short_scores = pd.DataFrame({
+        "appid": embedding_short_df["appid"],
+        "short_description_score": short_description_similarity,
+    })
 
-            combined_scores_df = pd.DataFrame({
-                    "appid": embedding_about_this_game_df["appid"],
-                    "about_this_game_score": about_this_game_similarity,
-                })
-            #Deleting to conserve space
-            del embedding_about_this_game_df
-            gc.collect()
+    # Combine scores
+    combined_scores_df = combined_scores_df.merge(
+        short_scores,
+        on="appid",
+        how="inner"
+    )
 
-            #Loading Dataset containing vectors for 'short_description'
-            embedding_short_description_df = pd.read_parquet(hf_base_url+"embedded_short_description.parquet")
+    combined_scores_df["combined_score"] = (
+        0.8 * combined_scores_df["about_this_game_score"] +
+        0.2 * combined_scores_df["short_description_score"]
+    )
 
-            #Establishing Embedding Matrix for 'short description'
-            embedding_short_description_matrix = np.vstack(
-                embedding_short_description_df["short_description_embedding"].values
-            )
+    # Top 100
+    top_100 = combined_scores_df.nlargest(
+        100,
+        "combined_score"
+    )
 
+    # Merge with Steam Store information
+    steam_results = top_100[
+        [
+            "appid",
+            "about_this_game_score",
+            "short_description_score",
+            "combined_score"
+        ]
+    ].merge(
+        Steam_Store_df,
+        on="appid",
+        how="left"
+    )
 
-            #cosine similarity matrix
-            short_description_similarity = cosine_similarity(query_embedding, embedding_short_description_matrix)[0]
-
-            short_scores = pd.DataFrame({
-                "appid": embedding_short_description_df["appid"],
-                "short_description_score": short_description_similarity,
-            })
-
-            #Deleting to conserve space
-            del embedding_short_description_df
-            gc.collect()
-
-            combined_scores_df = combined_scores_df.merge(short_scores,on="appid",how="inner")
-
-            combined_scores_df["combined_score"] = 0.8*combined_scores_df["about_this_game_score"] + 0.2*combined_scores_df["short_description_score"]
-
-            #Might adjust this to reduce analysis for RAG
-            top_100 = combined_scores_df.nlargest(100, "combined_score")
-
-            #Merge results with steam steam store information on App ID
-            steam_results = top_100[["appid","about_this_game_score","short_description_score","combined_score"]].merge(Steam_Store_df, on="appid", how="left")
-
-            return steam_results
+    return steam_results
 
 
 #Tag scoring
