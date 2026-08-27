@@ -22,11 +22,12 @@ import streamlit as st
 # clean_path = "/content/drive/MyDrive/CS X456.02/Project Data/clean/"
 processed_path = "data/processed/"
 clean_path = "data/clean/"
+hf_base_url = "https://huggingface.co/datasets/cdube001/steam-game-mvp-data/resolve/main/"
 
 #Reading the steam store clean data
 
 Steam_Spy_df = pd.read_parquet(clean_path+"steamspy_apps_clean.parquet")
-Steam_Store_df = pd.read_parquet(clean_path+"steam_store_clean.parquet")
+Steam_Store_df = pd.read_parquet(hf_base_url+"steam_store_clean.parquet")
 
 #--------------Gemini Model-----------------------------------------------------
 api_key = os.getenv("GEMINI_API_KEY")
@@ -47,7 +48,7 @@ def top100semanticsearch(input_text):
             query_embedding = text_model.encode(input_text)
 
             #Loading Dataset containing vectors for 'about this game'
-            embedding_about_this_game_df = pd.read_parquet(processed_path+"embedded_about_this_game.parquet")
+            embedding_about_this_game_df = pd.read_parquet(hf_base_url+"embedded_about_this_game.parquet")
 
             #Establishing Embedding Matrix for 'about this game'
             embedding__about_this_game_matrix = np.vstack(
@@ -67,7 +68,7 @@ def top100semanticsearch(input_text):
             gc.collect()
 
             #Loading Dataset containing vectors for 'short_description'
-            embedding_short_description_df = pd.read_parquet(processed_path+"embedded_short_description.parquet")
+            embedding_short_description_df = pd.read_parquet(hf_base_url+"embedded_short_description.parquet")
 
             #Establishing Embedding Matrix for 'short description'
             embedding_short_description_matrix = np.vstack(
