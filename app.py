@@ -30,7 +30,7 @@ Steam_Spy_df = pd.read_parquet(clean_path+"steamspy_apps_clean.parquet")
 Steam_Store_df = pd.read_parquet(hf_base_url+"steam_store_clean.parquet")
 
 #--------------Gemini Model-----------------------------------------------------
-api_key = os.getenv("GEMINI_API_KEY")
+api_key = st.secrets("GEMINI_API_KEY")
 client = genai.Client(api_key=api_key)
 
 #--------------Functions--------------------------------------------------------
