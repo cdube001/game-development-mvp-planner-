@@ -708,10 +708,17 @@ def game_concept(input_text, similarity_weight, tag_weight, top_games):
 
     # Loading Community Tags
     community_Steam_tags_df = pd.read_parquet(
-        clean_path + "steam_community_tags_clean.parquet"
+        clean_path + "steam_community_tags_clean.parquet",
+        columns=["appid", "tag_names"]
     )
-
     show_memory("After community tags loaded")
+    community_Steam_tags_df = community_Steam_tags_df[
+        community_Steam_tags_df["appid"].isin(
+            analysis_results["appid"]
+        )
+    ].copy()
+    show_memory("After community tags filtered")
+    
 
     # Merge community tags
     analysis_results = analysis_results.merge(
@@ -788,7 +795,7 @@ def game_concept(input_text, similarity_weight, tag_weight, top_games):
     # ---------------------------------------------------------------------------
 
     rag_results = rag_results.merge(
-        community_Steam_tags_df[['appid', 'tag_names']],
+        community_Steam_tags_df,
         on="appid",
         how="left"
     )
