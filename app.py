@@ -39,7 +39,7 @@ Steam_Spy_df = pd.read_parquet(clean_path+"steamspy_apps_clean.parquet")
 
 show_memory("After SteamSpy")
 
-@st.cache_data
+# @st.cache_data
 def load_steam_store():
     return pd.read_parquet(
         hf_base_url + "steam_store_clean.parquet"
