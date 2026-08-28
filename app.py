@@ -40,13 +40,13 @@ Steam_Spy_df = pd.read_parquet(clean_path+"steamspy_apps_clean.parquet")
 show_memory("After SteamSpy")
 
 # @st.cache_data
-def load_steam_store():
-    return pd.read_parquet(
-        hf_base_url + "steam_store_clean.parquet"
-    )
+# def load_steam_store():
+#     return pd.read_parquet(
+#         hf_base_url + "steam_store_clean.parquet"
+#     )
 
-Steam_Store_df = load_steam_store()
-show_memory("After Steam Store")
+# Steam_Store_df = load_steam_store()
+# show_memory("After Steam Store")
 
 #--------------Gemini Model-----------------------------------------------------
 api_key = st.secrets["GEMINI_API_KEY"]
@@ -215,7 +215,10 @@ def top100semanticsearch(input_text):
         100,
         "combined_score"
     )
-
+    show_memory("Before Steam Store")
+    Steam_Store_df = pd.read_parquet(hf_base_url + "steam_store_clean.parquet")
+    show_memory("After Steam Store loaded")
+    
     # Merge with Steam Store information
     steam_results = top_100[
         [
@@ -229,7 +232,15 @@ def top100semanticsearch(input_text):
         on="appid",
         how="left"
     )
+    show_memory("After Steam Store merge")
+    
+    del Steam_Store_df
+    del top_100
+    del combined_scores_df
+    gc.collect()
 
+    show_memory("After Steam Store deleted")
+    
     return steam_results
 
 
