@@ -887,7 +887,7 @@ if st.button("Analyze Game Concept", type="primary"):
                   tag_weight,
                   top_games
           )
-
+        show_memory("End game_concept")
         games_response = response["retrieved_similar_games"]
         characteristics_response = response["common_community_highlighted_gameplay_characteristics"]
         features_response = response["frequent_steam_features"]
@@ -1083,5 +1083,5 @@ if st.button("Analyze Game Concept", type="primary"):
                   st.write(item["details"])
 
 st.divider()
-
+show_memory("End dashboard")
 st.caption("MVP Tool for Game Development")
