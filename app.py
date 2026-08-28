@@ -182,6 +182,7 @@ def top100semanticsearch(input_text):
     show_memory("After Short similarity")
     
     del short_embedding_matrix
+    del query_embedding
     gc.collect()
     
     show_memory("After Short deleted")
@@ -215,6 +216,8 @@ def top100semanticsearch(input_text):
         100,
         "combined_score"
     )
+    
+    
     show_memory("Before Steam Store")
     Steam_Store_df = pd.read_parquet(hf_base_url + "steam_store_clean.parquet")
     show_memory("After Steam Store loaded")
@@ -930,7 +933,8 @@ if st.button("Analyze Game Concept", type="primary"):
                         display_text="Open Steam"
                     )
                 },
-                use_container_width=True,
+        
+                width="stretch",
                 hide_index=True
             )
 
@@ -963,7 +967,7 @@ if st.button("Analyze Game Concept", type="primary"):
                               display_text="Open Steam"
                             )
                          },
-                         use_container_width=True,
+                         width="stretch",
                          hide_index=True
                     )
             st.caption(
@@ -1042,7 +1046,7 @@ if st.button("Analyze Game Concept", type="primary"):
 
                     st.dataframe(
                         display_data,
-                        use_container_width=True,
+                        width="stretch",
                         hide_index=True
                     )
 
