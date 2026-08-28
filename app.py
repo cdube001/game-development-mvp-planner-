@@ -43,9 +43,19 @@ api_key = st.secrets["GEMINI_API_KEY"]
 client = genai.Client(api_key=api_key)
 
 #--------------Functions--------------------------------------------------------
-@st.cache_resource
+
 def load_embedding_model():
     return SentenceTransformer("BAAI/bge-base-en-v1.5")
+
+def download_file(url,filepath):
+        with requests.get(url, stream=True) as response:
+                response.raise_for_status()
+
+                with open(filepath,"wb") as f:
+                    for chunk in response.iter_content(chunk_size=1024*1024):
+                            if chunk:
+                                    f.write(chunk)
+
 
 @st.cache_resource
 def load_embedding_data():
@@ -58,127 +68,112 @@ def load_embedding_data():
 
     # Download About This Game embeddings
     if not os.path.exists(about_embeddings_path):
-        response = requests.get(
-            hf_base_url + "about_this_game_embeddings.npy"
+        download_file(
+            hf_base_url + "about_this_game_embeddings.npy",
+            about_embeddings_path
         )
-        response.raise_for_status()
-
-        with open(about_embeddings_path, "wb") as f:
-            f.write(response.content)
 
     # Download About This Game app IDs
     if not os.path.exists(about_appids_path):
-        response = requests.get(
-            hf_base_url + "about_this_game_appids.npy"
+        download_file(
+            hf_base_url + "about_this_game_appids.npy",
+            about_appids_path
         )
-        response.raise_for_status()
-
-        with open(about_appids_path, "wb") as f:
-            f.write(response.content)
 
     # Download Short Description embeddings
     if not os.path.exists(short_embeddings_path):
-        response = requests.get(
-            hf_base_url + "short_description_embeddings.npy"
+        download_file(
+            hf_base_url + "short_description_embeddings.npy",
+            short_embeddings_path
         )
-        response.raise_for_status()
-
-        with open(short_embeddings_path, "wb") as f:
-            f.write(response.content)
-
+        
     # Download Short Description app IDs
     if not os.path.exists(short_appids_path):
-        response = requests.get(
-            hf_base_url + "short_description_appids.npy"
+        download_file(
+            hf_base_url + "short_description_appids.npy",
+            short_appids_path
         )
-        response.raise_for_status()
-
-        with open(short_appids_path, "wb") as f:
-            f.write(response.content)
-
-    # Memory-map embeddings instead of loading them entirely into RAM
-    about_this_game_matrix = np.load(
-        about_embeddings_path,
-        mmap_mode="r"
-    )
-
-    short_description_matrix = np.load(
-        short_embeddings_path,
-        mmap_mode="r"
-    )
-
-    # App IDs are small, so normal loading is fine
-    about_appids = np.load(about_appids_path)
-    short_appids = np.load(short_appids_path)
 
     return (
-        about_appids,
-        about_this_game_matrix,
-        short_appids,
-        short_description_matrix
+        about_embeddings_path,
+        about_appids_path,
+        short_embeddings_path,
+        short_appids_path
     )
  
 
-@st.cache_resource
-def get_embedding_resources():
-
-    model = load_embedding_model()
-
-    (
-        about_appids,
-        about_matrix,
-        short_appids,
-        short_matrix
-    ) = load_embedding_data()
-
-    return (
-        model,
-        about_appids,
-        about_matrix,
-        short_appids,
-        short_matrix
-    )
 
 # Returning top 100 results based on semantic vector search
 # Semantic similarity captures conceptual relationships but may place substantial weight on named entities,
 # so community-generated tags were incorporated as an additional signal to emphasize gameplay characteristics.
 def top100semanticsearch(input_text):
+    
+    # Create Query Embedding
 
-    (
-        text_model,
-        about_appids,
-        about_embedding_matrix,
-        short_appids,
-        short_embedding_matrix
-    ) = get_embedding_resources()
-
+    text_model = load_embedding_model()
+    
     query_embedding = text_model.encode(
         input_text,
         convert_to_numpy=True
     )
 
+    del text_model
+    gc.collect()
+
+    # Get embedding file paths
+    (
+        about_embeddings_path,
+        about_appids_path,
+        short_embeddings_path,
+        short_appids_path
+    ) = load_embedding_data()
+    
     # About This Game similarity
+
+    about_appids = np.load(about_appids_path)
+
+    about_embedding_matrix = np.load(about_embeddings_path, mmap_mode="r")
+    
     about_this_game_similarity = cosine_similarity(
         query_embedding.reshape(1, -1),
         about_embedding_matrix
     )[0]
 
+    del about_embedding_matrix
+    gc.collect()
+    
     combined_scores_df = pd.DataFrame({
         "appid": about_appids,
         "about_this_game_score": about_this_game_similarity,
     })
-
+    
+    # Release objects no longer needed
+    del about_appids
+    del about_this_game_similarity
+    gc.collect()
+    
     # Short Description similarity
+    short_appids = np.load(short_appids_path)
+
+    short_embedding_matrix = np.load(short_embeddings_path, mmap_mode="r")
+    
     short_description_similarity = cosine_similarity(
         query_embedding.reshape(1, -1),
         short_embedding_matrix
     )[0]
 
+    del short_embedding_matrix
+    gc.collect()
+    
     short_scores = pd.DataFrame({
         "appid": short_appids,
         "short_description_score": short_description_similarity,
     })
-
+    
+    del short_appids
+    del short_description_similarity
+    gc.collect()
+    
     # Combine scores
     combined_scores_df = combined_scores_df.merge(
         short_scores,
@@ -186,6 +181,9 @@ def top100semanticsearch(input_text):
         how="inner"
     )
 
+    del short_scores
+    gc.collect()
+    
     combined_scores_df["combined_score"] = (
         0.8 * combined_scores_df["about_this_game_score"] +
         0.2 * combined_scores_df["short_description_score"]
