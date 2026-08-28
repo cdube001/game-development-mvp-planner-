@@ -882,7 +882,7 @@ def game_concept(input_text, similarity_weight, tag_weight, top_games):
 
     show_memory("After prompt created")
 
-    USE_TEST_RESPONSE = True
+    USE_TEST_RESPONSE = False
 
     if USE_TEST_RESPONSE:
         response = test_gemini_response()
