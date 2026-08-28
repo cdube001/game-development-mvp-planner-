@@ -887,8 +887,12 @@ def game_concept(input_text, similarity_weight, tag_weight, top_games):
     if USE_TEST_RESPONSE:
         response = test_gemini_response()
     else:
-        response = generate_response_gemini(prompt)
-
+        try:
+            response = generate_response_gemini(prompt)
+        except Exception:
+            st.error("AI recommendations are temporarily unavailable. Please try again later.")
+            return
+            
     show_memory("After Gemini response")
 
     return (
