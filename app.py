@@ -343,94 +343,97 @@ def combined_scoring(input_text, sim_weight, tag_weight):
 
 # Due to the limited resources for gpu use on google colab, created a gemini option
 def generate_response_gemini(prompt):
-    response = client.models.generate_content(
-        model="gemini-3.6-flash",
-        contents=prompt,
-        config={
-            "system_instruction": """You are a video game recommendation assistant.
-            Follow the user's instructions exactly.
-            When retrieved information is provided, prioritize that information
-            and do not use outside knowledge unless the instructions explicitly allow it.""",
-
-            "response_mime_type": "application/json",
-
-            "response_schema": {
-                "type": "OBJECT",
-                "properties": {
-                    "retrieved_similar_games": {
-                        "type": "ARRAY",
-                        "items": {
-                            "type": "OBJECT",
-                            "properties": {
-                                "rank": {"type": "INTEGER"},
-                                "game": {"type": "STRING"},
-                                "score": {"type": "NUMBER"}
-                            },
-                            "required": ["rank", "game", "score"]
+    try:
+        response = client.models.generate_content(
+            model="gemini-3.6-flash",
+            contents=prompt,
+            config={
+                "system_instruction": """You are a video game recommendation assistant.
+                Follow the user's instructions exactly.
+                When retrieved information is provided, prioritize that information
+                and do not use outside knowledge unless the instructions explicitly allow it.""",
+    
+                "response_mime_type": "application/json",
+    
+                "response_schema": {
+                    "type": "OBJECT",
+                    "properties": {
+                        "retrieved_similar_games": {
+                            "type": "ARRAY",
+                            "items": {
+                                "type": "OBJECT",
+                                "properties": {
+                                    "rank": {"type": "INTEGER"},
+                                    "game": {"type": "STRING"},
+                                    "score": {"type": "NUMBER"}
+                                },
+                                "required": ["rank", "game", "score"]
+                            }
+                        },
+    
+                        "common_community_highlighted_gameplay_characteristics": {
+                            "type": "ARRAY",
+                            "items": {
+                                "type": "OBJECT",
+                                "properties": {
+                                    "characteristic": {"type": "STRING"},
+                                    "frequency": {"type": "NUMBER"},
+                                    "supporting_games": {
+                                        "type": "ARRAY",
+                                        "items": {"type": "STRING"}
+                                    }
+                                },
+                                "required": [
+                                    "characteristic",
+                                    "frequency",
+                                    "supporting_games"
+                                ]
+                            }
+                        },
+    
+                        "frequent_steam_features": {
+                            "type": "ARRAY",
+                            "items": {
+                                "type": "OBJECT",
+                                "properties": {
+                                    "feature": {"type": "STRING"},
+                                    "frequency": {"type": "NUMBER"}
+                                },
+                                "required": ["feature", "frequency"]
+                            }
+                        },
+    
+                        "potential_gameplay_features_worth_considering": {
+                            "type": "ARRAY",
+                            "items": {
+                                "type": "OBJECT",
+                                "properties": {
+                                    "recommendation": {"type": "STRING"},
+                                    "details": {"type": "STRING"}
+                                },
+                                "required": [
+                                    "recommendation",
+                                    "details"
+                                ]
+                            }
                         }
                     },
-
-                    "common_community_highlighted_gameplay_characteristics": {
-                        "type": "ARRAY",
-                        "items": {
-                            "type": "OBJECT",
-                            "properties": {
-                                "characteristic": {"type": "STRING"},
-                                "frequency": {"type": "NUMBER"},
-                                "supporting_games": {
-                                    "type": "ARRAY",
-                                    "items": {"type": "STRING"}
-                                }
-                            },
-                            "required": [
-                                "characteristic",
-                                "frequency",
-                                "supporting_games"
-                            ]
-                        }
-                    },
-
-                    "frequent_steam_features": {
-                        "type": "ARRAY",
-                        "items": {
-                            "type": "OBJECT",
-                            "properties": {
-                                "feature": {"type": "STRING"},
-                                "frequency": {"type": "NUMBER"}
-                            },
-                            "required": ["feature", "frequency"]
-                        }
-                    },
-
-                    "potential_gameplay_features_worth_considering": {
-                        "type": "ARRAY",
-                        "items": {
-                            "type": "OBJECT",
-                            "properties": {
-                                "recommendation": {"type": "STRING"},
-                                "details": {"type": "STRING"}
-                            },
-                            "required": [
-                                "recommendation",
-                                "details"
-                            ]
-                        }
-                    }
-                },
-
-                "required": [
-                    "retrieved_similar_games",
-                    "common_community_highlighted_gameplay_characteristics",
-                    "frequent_steam_features",
-                    "potential_gameplay_features_worth_considering"
-                ]
+    
+                    "required": [
+                        "retrieved_similar_games",
+                        "common_community_highlighted_gameplay_characteristics",
+                        "frequent_steam_features",
+                        "potential_gameplay_features_worth_considering"
+                    ]
+                }
             }
-        }
-    )
+        )
+    
+        return json.loads(response.text)
 
-    return json.loads(response.text)
-
-
+    except Exception as e:
+            print(f"Gemini error: {e}")
+            return None
 def create_rag_context(df):
 
   #Initialzing the context that will create structure for the model to understand the prompt
@@ -887,11 +890,8 @@ def game_concept(input_text, similarity_weight, tag_weight, top_games):
     if USE_TEST_RESPONSE:
         response = test_gemini_response()
     else:
-        try:
-            response = generate_response_gemini(prompt)
-        except Exception:
-            st.error("AI recommendations are temporarily unavailable. Please try again later.")
-            return
+        response = generate_response_gemini(prompt)
+        
             
     show_memory("After Gemini response")
 
@@ -965,10 +965,13 @@ if st.button("Analyze Game Concept", type="primary"):
                   top_games
           )
         show_memory("End game_concept")
-        games_response = response["retrieved_similar_games"]
-        characteristics_response = response["common_community_highlighted_gameplay_characteristics"]
-        features_response = response["frequent_steam_features"]
-        recommendations_response = response["potential_gameplay_features_worth_considering"]
+        if response is not None:
+            games_response = response["retrieved_similar_games"]
+            characteristics_response = response["common_community_highlighted_gameplay_characteristics"]
+            features_response = response["frequent_steam_features"]
+            recommendations_response = response["potential_gameplay_features_worth_considering"]
+        else:
+            recommendations_response = None
 
 
 
@@ -1154,10 +1157,13 @@ if st.button("Analyze Game Concept", type="primary"):
             "and your proposed game concept. Recommendations are suggestions, "
             "not features directly observed in every retrieved game."
         )
-        for item in recommendations_response:
-              with st.container(border=True):
-                  st.markdown(f"<p style='font-size:18px; font-weight:600; margin-bottom:4px;'> {item['recommendation']}</p>",unsafe_allow_html=True)
-                  st.write(item["details"])
+        if recommendations_response is not None:
+                for item in recommendations_response:
+                      with st.container(border=True):
+                          st.markdown(f"<p style='font-size:18px; font-weight:600; margin-bottom:4px;'> {item['recommendation']}</p>",unsafe_allow_html=True)
+                          st.write(item["details"])
+        else:
+                st.warning("AI-generated recommendations are temporarily unavailable.")           
 
 st.divider()
 show_memory("End dashboard")
