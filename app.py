@@ -18,6 +18,13 @@ from google import genai
 
 import streamlit as st
 
+import psutil
+import os
+
+def show_memory(label):
+    process = psutil.Process(os.getpid())
+    memory_mb = process.memory_info().rss / (1024 ** 2)
+    print(f"[RAM] {label}: {memory_mb:.1f} MB", flush=True)
 #-----------Dataset Loading-----------------------------------------------------
 #establish paths for processed and clean data
 # processed_path = "/content/drive/MyDrive/CS X456.02/Project Data/processed/"
@@ -37,6 +44,7 @@ def load_steam_store():
     )
 
 Steam_Store_df = load_steam_store()
+show_memory("After Steam Store")
 
 #--------------Gemini Model-----------------------------------------------------
 api_key = st.secrets["GEMINI_API_KEY"]
@@ -109,17 +117,19 @@ def load_embedding_data():
 def top100semanticsearch(input_text):
     
     # Create Query Embedding
-
+    show_memory("Before BGE")
     text_model = load_embedding_model()
-    
+        
     query_embedding = text_model.encode(
         input_text,
         convert_to_numpy=True
     )
-
+    show_memory("After BGE loaded")
+    
     del text_model
     gc.collect()
-
+    show_memory("After BGE deleted")
+    
     # Get embedding file paths
     (
         about_embeddings_path,
@@ -134,13 +144,18 @@ def top100semanticsearch(input_text):
 
     about_embedding_matrix = np.load(about_embeddings_path, mmap_mode="r")
     
+    show_memory("About embedding mapped")
+    
     about_this_game_similarity = cosine_similarity(
         query_embedding.reshape(1, -1),
         about_embedding_matrix
     )[0]
-
+    show_memory("After About similarity")
+    
     del about_embedding_matrix
     gc.collect()
+    
+    show_memory("After About embedding deleted")
     
     combined_scores_df = pd.DataFrame({
         "appid": about_appids,
@@ -156,14 +171,18 @@ def top100semanticsearch(input_text):
     short_appids = np.load(short_appids_path)
 
     short_embedding_matrix = np.load(short_embeddings_path, mmap_mode="r")
+    show_memory("Short embedding mapped")
     
     short_description_similarity = cosine_similarity(
         query_embedding.reshape(1, -1),
         short_embedding_matrix
     )[0]
-
+    show_memory("After Short similarity")
+    
     del short_embedding_matrix
     gc.collect()
+    
+    show_memory("After Short deleted")
     
     short_scores = pd.DataFrame({
         "appid": short_appids,
@@ -830,6 +849,8 @@ with st.sidebar:
     # selected_attribute = st.selectbox("Attribute: ", 1,index=0)
 
 user_concept_input = st.text_area("Describe a game concept:", height=150, placeholder="Enter here...")
+
+show_memory("Startup")
 
 if st.button("Analyze Game Concept", type="primary"):
     if not user_concept_input.strip():
