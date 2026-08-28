@@ -11,15 +11,14 @@ import os
 import re
 import json
 import requests
-
+import psutil
 
 from google import genai
 # from google.colab import userdata
 
 import streamlit as st
 
-import psutil
-import os
+
 
 def show_memory(label):
     process = psutil.Process(os.getpid())
@@ -33,9 +32,12 @@ processed_path = "data/processed/"
 clean_path = "data/clean/"
 hf_base_url = "https://huggingface.co/datasets/cdube001/steam-game-mvp-data/resolve/main/"
 
+show_memory("After imports")
 #Reading the steam store clean data
 
 Steam_Spy_df = pd.read_parquet(clean_path+"steamspy_apps_clean.parquet")
+
+show_memory("After SteamSpy")
 
 @st.cache_data
 def load_steam_store():
