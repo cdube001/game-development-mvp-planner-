@@ -671,73 +671,138 @@ def test_gemini_response():
 
 def game_concept(input_text, similarity_weight, tag_weight, top_games):
 
+    show_memory("Game concept START")
 
+    combined_results = combined_scoring(
+        input_text,
+        similarity_weight,
+        tag_weight
+    )
 
-    combined_results = combined_scoring(input_text,similarity_weight,tag_weight)
+    show_memory("After combined scoring")
 
-    #Top 100 for analysis
+    # Top 100 for analysis
     analysis_results = combined_results.head(100).copy()
 
-    #Grabbing the top 5 results to reduce workload of RAG
+    # Top games for RAG
     rag_results = combined_results.head(top_games)
 
-    #---------------------------------------------------------------------------
-    # Top 100 Analysis
-    #---------------------------------------------------------------------------
+    show_memory("After analysis/rag results")
 
-    #compiles list of features across top results and returning the frequency they appear
+    # ---------------------------------------------------------------------------
+    # Top 100 Analysis
+    # ---------------------------------------------------------------------------
+
     list_features = steam_feature_frequency(analysis_results)
 
-    feature_group_results = steam_feature_group_frequency(analysis_results)
+    feature_group_results = steam_feature_group_frequency(
+        analysis_results
+    )
 
-    #compiling the information to feed into the LLM
-    feature_context = steam_feature_frequency_context(list_features, 100)
+    feature_context = steam_feature_frequency_context(
+        list_features,
+        100
+    )
 
-    #Loading Community Tags
-    community_Steam_tags_df = pd.read_parquet(clean_path+"steam_community_tags_clean.parquet")
+    show_memory("After feature analysis")
 
-    #Merging community tags to use for RAG context
-    analysis_results = analysis_results.merge(community_Steam_tags_df[['appid','tag_names']], on="appid",how="left")
+    # Loading Community Tags
+    community_Steam_tags_df = pd.read_parquet(
+        clean_path + "steam_community_tags_clean.parquet"
+    )
 
+    show_memory("After community tags loaded")
 
-    #Incorporate Steam Spy Dataset popularity metrics
-    analysis_results = analysis_results.merge(Steam_Spy_df[['appid','ccu','positive','negative']], on="appid",how="left")
-    analysis_results['review_count'] = (analysis_results['positive'].fillna(0) + analysis_results['negative'].fillna(0))
+    # Merge community tags
+    analysis_results = analysis_results.merge(
+        community_Steam_tags_df[['appid', 'tag_names']],
+        on="appid",
+        how="left"
+    )
 
-    # Log-transform popularity metrics
-    analysis_results['log_ccu'] = np.log1p(analysis_results['ccu'])
+    show_memory("After community tags merged")
 
-    analysis_results['log_reviews'] = np.log1p(analysis_results['review_count'])
+    # SteamSpy popularity metrics
+    analysis_results = analysis_results.merge(
+        Steam_Spy_df[['appid', 'ccu', 'positive', 'negative']],
+        on="appid",
+        how="left"
+    )
 
-    # Normalize both metrics
+    show_memory("After SteamSpy merged")
+
+    analysis_results['review_count'] = (
+        analysis_results['positive'].fillna(0) +
+        analysis_results['negative'].fillna(0)
+    )
+
+    analysis_results['log_ccu'] = np.log1p(
+        analysis_results['ccu']
+    )
+
+    analysis_results['log_reviews'] = np.log1p(
+        analysis_results['review_count']
+    )
+
     scaler = MinMaxScaler()
 
-    analysis_results[['CCU Score', 'Review Score']] = scaler.fit_transform(analysis_results[['log_ccu', 'log_reviews']])
+    analysis_results[['CCU Score', 'Review Score']] = (
+        scaler.fit_transform(
+            analysis_results[['log_ccu', 'log_reviews']]
+        )
+    )
 
-    # Calculate popularity/engagement score
     analysis_results['Engagement Score'] = (
         0.4 * analysis_results['CCU Score'] +
         0.6 * analysis_results['Review Score']
     )
-    popular_similar_games = analysis_results.sort_values('Engagement Score',ascending=False).head(top_games).copy()
 
+    popular_similar_games = (
+        analysis_results
+        .sort_values(
+            'Engagement Score',
+            ascending=False
+        )
+        .head(top_games)
+        .copy()
+    )
 
-    #compiles list of tags across top results and returning the frequency they appear
-    tag_context, tag_frequency = community_tag_frequency_context(analysis_results)
+    show_memory("After popularity calculation")
 
-    #compiling a market summary
+    # Tag frequency
+    tag_context, tag_frequency = (
+        community_tag_frequency_context(
+            analysis_results
+        )
+    )
+
+    show_memory("After tag frequency")
+
+    # Market summary
     market_data = market_summary(analysis_results)
 
+    show_memory("After market summary")
 
+    # ---------------------------------------------------------------------------
+    # RAG
+    # ---------------------------------------------------------------------------
 
-    #gathering game description context
+    rag_results = rag_results.merge(
+        community_Steam_tags_df[['appid', 'tag_names']],
+        on="appid",
+        how="left"
+    )
 
-    #Merging community tags to use for RAG context
-    rag_results = rag_results.merge(community_Steam_tags_df[['appid','tag_names']], on="appid",how="left")
+    show_memory("After RAG tag merge")
 
     del community_Steam_tags_df
+    gc.collect()
+
+    show_memory("After community tags deleted")
 
     game_context = create_rag_context(rag_results)
+
+    show_memory("After RAG context")
 
     prompt = f"""
 
@@ -795,7 +860,7 @@ def game_concept(input_text, similarity_weight, tag_weight, top_games):
 
                   Output Format:
                   - Return the response as valid JSON.
-                  - The KSON must contain exactly these four top-level keys, in this order:
+                  - The JSON must contain exactly these four top-level keys, in this order:
                       1. "retrieved_similar_games"
                       2. "common_community_highlighted_gameplay_characteristics"
                       3. "frequent_steam_features"
@@ -808,15 +873,16 @@ def game_concept(input_text, similarity_weight, tag_weight, top_games):
     # context = game_context + "\n" + feature_context
 
 
+    show_memory("After prompt created")
+
     USE_TEST_RESPONSE = True
 
     if USE_TEST_RESPONSE:
-        #TEST SAMPLE
         response = test_gemini_response()
     else:
-        #Giving prompt to Gemini (Google LLM)
         response = generate_response_gemini(prompt)
 
+    show_memory("After Gemini response")
 
     return (
         response,
