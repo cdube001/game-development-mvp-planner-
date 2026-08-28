@@ -221,7 +221,15 @@ def top100semanticsearch(input_text):
     show_memory("Before Steam Store")
     Steam_Store_df = pd.read_parquet(hf_base_url + "steam_store_clean.parquet")
     show_memory("After Steam Store loaded")
+
+    print("COLUMNS:")
+    print(Steam_Store_df.columns.tolist())
     
+    print("\nMEMORY BY COLUMN:")
+    print(
+        Steam_Store_df.memory_usage(deep=True)
+        .sort_values(ascending=False)
+    )
     # Merge with Steam Store information
     steam_results = top_100[
         [
