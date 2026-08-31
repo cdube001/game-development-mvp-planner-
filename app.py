@@ -561,13 +561,14 @@ def community_tag_frequency_context(df):
     return tag_context, tag_frequency
 
 def market_summary(df):
-    market_data = {}
+    # market_data = {}
 
-    market_data['average_price'] = df['initial_price'].mean()
-    market_data['median_price'] = df['initial_price'].median()
-    market_data['minimum_price'] = df['initial_price'].min()
-    market_data['maximum_price'] = df['initial_price'].max()
+    # market_data['average_price'] = df['initial_price'].mean()
+    # market_data['median_price'] = df['initial_price'].median()
+    # market_data['minimum_price'] = df['initial_price'].min()
+    # market_data['maximum_price'] = df['initial_price'].max()
 
+    market_data = df[["appid",'initial_price','current_price','is_free','coming_soon','release_year','release_month','release_day']]
     return market_data
 
 #---------------------TEST------------------------------------------------------
@@ -792,7 +793,7 @@ def game_concept(input_text, similarity_weight, tag_weight, top_games):
 
     # Market summary
     market_data = market_summary(analysis_results)
-
+    
     show_memory("After market summary")
 
     # ---------------------------------------------------------------------------
@@ -887,7 +888,7 @@ def game_concept(input_text, similarity_weight, tag_weight, top_games):
 
     show_memory("After prompt created")
 
-    USE_TEST_RESPONSE = False
+    USE_TEST_RESPONSE = True
 
     if USE_TEST_RESPONSE:
         response = test_gemini_response()
@@ -1066,26 +1067,26 @@ if st.button("Analyze Game Concept", type="primary"):
             )
 
         st.subheader("Market & Pricing Among Similar Games")
+        st.dataframe(market_data)
+        # col1, col2, col3, col4  = st.columns(4)
+        # col1.metric(
+        #     "Median Price",
+        #     f"${market_data['median_price']:.2f}"
+        # )
+        # col2.metric(
+        #     "Average Price",
+        #     f"${market_data['average_price']:.2f}"
+        # )
 
-        col1, col2, col3, col4  = st.columns(4)
-        col1.metric(
-            "Median Price",
-            f"${market_data['median_price']:.2f}"
-        )
-        col2.metric(
-            "Average Price",
-            f"${market_data['average_price']:.2f}"
-        )
+        # col3.metric(
+        #     "Lowest Price",
+        #     f"${market_data['minimum_price']:.2f}"
+        # )
 
-        col3.metric(
-            "Lowest Price",
-            f"${market_data['minimum_price']:.2f}"
-        )
-
-        col4.metric(
-            "Highest Price",
-            f"${market_data['maximum_price']:.2f}"
-        )
+        # col4.metric(
+        #     "Highest Price",
+        #     f"${market_data['maximum_price']:.2f}"
+        # )
 
 
         st.subheader("Common Features Across Similar Games")
