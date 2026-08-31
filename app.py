@@ -938,16 +938,18 @@ def price_histogram(market_data):
 
     price_counts.columns = ["Price", "Games"]
 
-     # Separate Free and paid prices
+     # Separate Free, Not Available, and paid prices
     free_data = price_counts[price_counts["Price"] == "Free"]
-
+    not_available_data = price_counts[price_counts["Price"] == "Not Available"]
     paid_data = price_counts[price_counts["Price"] != "Free"].copy()
-
+    st.write(free_data)
+    st.write(not_available_data)
+    st.write(paid_data)
 
     paid_data["sort_price"] = (paid_data["Price"].str.replace("$","", regex=False).astype(float))
 
     paid_data = paid_data.sort_values("sort_price")
-    price_counts = pd.concat([free_data,paid_data])
+    price_counts = pd.concat([free_data,not_available_data,paid_data])
 
 
 
