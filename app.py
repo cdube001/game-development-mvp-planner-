@@ -941,7 +941,7 @@ def price_histogram(market_data):
     paid_data["sort_price"] = (paid_data["Price"].str.replace("$","", regex=False).astype(float))
     st.write(paid_data)
 
-    paid_data = paid_data.sort_values("sort_prices")
+    paid_data = paid_data.sort_values("sort_price")
     price_counts = pd.concat([free_data,paid_data])
 
 
