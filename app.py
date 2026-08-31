@@ -941,7 +941,11 @@ def price_histogram(market_data):
      # Separate Free, Not Available, and paid prices
     free_data = price_counts[price_counts["Price"] == "Free"]
     not_available_data = price_counts[price_counts["Price"] == "Not Available"]
-    paid_data = price_counts[price_counts["Price"] != "Free"].copy()
+
+    paid_data = price_counts[
+        ~price_counts["Price"].isin(["Free", "Not Available"])
+    ].copy()
+
     st.write(free_data)
     st.write(not_available_data)
     st.write(paid_data)
