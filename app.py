@@ -954,6 +954,10 @@ def price_histogram(market_data):
     #            )
     # )
     figure.update_traces(width=1.0)
+    figure.update_xaxes(
+        tickprefix="$",
+        tickformat=".2f"
+    )
     st.plotly_chart(figure, use_container_width=True)
 
 
