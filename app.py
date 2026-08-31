@@ -939,7 +939,6 @@ def price_histogram(market_data):
 
 
     paid_data["sort_price"] = (paid_data["Price"].str.replace("$","", regex=False).astype(float))
-    st.write(paid_data)
 
     paid_data = paid_data.sort_values("sort_price")
     price_counts = pd.concat([free_data,paid_data])
@@ -956,8 +955,8 @@ def price_histogram(market_data):
     figure.update_traces(width=1.0)
     figure.update_xaxes(
         tickmode="array",
-        tickvals=[9.99, 19.99, 29.99, 39.99, 49.99,59.99,69.99],
-        ticktext=["$9.99", "$19.99", "$29.99", "$39.99","49.99","59.99","69.99"]
+        tickvals=[4.99,9.99, 19.99, 29.99, 39.99, 49.99, 59.99, 69.99],
+        ticktext=["$4.99","$9.99", "$19.99", "$29.99", "$39.99","49.99","59.99","69.99"]
     )
     st.plotly_chart(figure, use_container_width=True)
 
