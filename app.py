@@ -956,7 +956,7 @@ def price_histogram(market_data):
     figure.update_traces(width=1.0)
     figure.update_xaxes(
         tickmode="array",
-        tickvals=[9.99, 19.99, 29.99, 39.99],
+        tickvals=[9.99, 19.99, 29.99, 39.99, 49.99,59.99,69.99],
         ticktext=["$9.99", "$19.99", "$29.99", "$39.99","49.99","59.99","69.99"]
     )
     st.plotly_chart(figure, use_container_width=True)
