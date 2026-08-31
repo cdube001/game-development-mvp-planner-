@@ -914,11 +914,21 @@ def dashboard_section(title, content):
     )
 
 def price_histogram(market_data):
-    price_data = market_data[market_data["initial_price"].notna()].copy()
+    price_data = market_data[(market_data["initial_price"].notna())].copy()
+    
+    price_data["Price"] = np.where(
+        price_data["is_free"] == 1,
+        "Free",
+        price_data["initial_price"].apply(
+            lambda x: f"${x:.2f}" if pd.notna(x) else "Unknown"
+        )
+    
+    st.write(price_data)
+    # figure = px.histogram(price_data, x="initial_price", nbins=20,title="Price Distribution Among Similar Games", labels={"current_price": " Price($)"})
+    # figure.update_layout(xaxis_title="Price ($)", yaxis_title="Number of Games")
+    # st.plotly_chart(figure, use_container_width=True)
 
-    figure = px.histogram(price_data, x="initial_price", nbins=20,title="Price Distribution Among Similar Games", labels={"current_price": " Price($)"})
-    figure.update_layout(xaxis_title="Price ($)", yaxis_title="Number of Games")
-    st.plotly_chart(figure, use_container_width=True)
+
 
 def market_summary(df):
     market_data = {}
@@ -1076,7 +1086,7 @@ if st.button("Analyze Game Concept", type="primary"):
 
         st.subheader("Market & Pricing Among Similar Games")
         price_histogram(market_data)
-        
+
         price_data = market_summary(market_data)
         col1, col2, col3, col4  = st.columns(4)
         col1.metric(
