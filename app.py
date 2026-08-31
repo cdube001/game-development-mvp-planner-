@@ -953,7 +953,7 @@ def price_histogram(market_data):
     #                 categoryarray=price_counts["Price"].tolist()
     #            )
     # )
-
+    figure.update_traces(width=1.0)
     st.plotly_chart(figure, use_container_width=True)
 
 
