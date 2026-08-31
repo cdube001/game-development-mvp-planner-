@@ -928,7 +928,7 @@ def price_histogram(market_data):
 
     figure = px.histogram(price_data, x="initial_price", nbins=20,title="Price Distribution Among Similar Games", labels={"current_price": " Price($)"})
     figure.update_layout(xaxis_title="Price ($)", yaxis_title="Number of Games")
-    st.plotly_chat(figure, use_container_width=True)
+    st.plotly_chart(figure, use_container_width=True)
 
 #----------------Streamlit----------------------------------------------------------------------------------------------------------------
 st.set_page_config(page_title="Game Development MVP Planning Tool", page_icon="placeholder",layout="wide")
