@@ -972,14 +972,23 @@ def price_histogram(market_data):
     )
     st.plotly_chart(figure, use_container_width=True)
 
-    status_counts = price_data["Price"].value_counts().reset_index()
-    status_counts.columns = ["Price", "Games"]
+    price_data["Pricing Status"] = np.where(
+        price_data["is_free"] == 1,
+        "Free",
+        np.where(
+            price_data["coming_soon"] == 1,
+            "Not Available",
+            "Paid"
+        )
+    )
+    status_counts = price_data["Pricing_Status"].value_counts().reset_index()
+    status_counts.columns = ["Status", "Games"]
 
-    status_figure = px.pie(status_counts,names="Price",values="Games",title="Pricing Status Among Similar Games")
+    status_figure = px.pie(status_counts,names="Status",values="Games",title="Pricing Status Among Similar Games")
 
     status_figure.update_traces(textinfo="label+percent")
     st.plotly_chart(status_figure, use_container_width=True)
-    
+
     # col1, col2, col3 = st.columns(3)
 
     # paid_count = price_data["Price"].str.startswith("$").sum()
