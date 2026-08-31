@@ -978,6 +978,8 @@ def price_histogram(market_data):
     status_figure = px.pie(status_counts,names="Price",values="Games",title="Pricing Status Among Similar Games")
 
     status_figure.update_traces(textinfo="label+percent")
+    st.plotly_chart(status_figure, use_container_width=True)
+    
     # col1, col2, col3 = st.columns(3)
 
     # paid_count = price_data["Price"].str.startswith("$").sum()
