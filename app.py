@@ -936,25 +936,24 @@ def price_histogram(market_data):
     free_data = price_counts[price_counts["Price"] == "Free"]
 
     paid_data = price_counts[price_counts["Price"] != "Free"].copy()
-    
-    st.write(free_data)
-    st.write(paid_data)
+
 
     paid_data["sort_price"] = (paid_data["Price"].str.replace("$","", regex=False).astype(float))
     st.write(paid_data)
 
+    paid_data = paid_data.sort_values("sort_prices")
     price_counts = pd.concat([free_data,paid_data])
-    st.write(price_counts)
+
 
 
     figure = px.bar(price_counts, x="Price", y="Games",title="Price Distribution Among Similar Games", labels={"Price": " Price($)", "Games": "Number of Games"})
-    figure.update_layout(
-           xaxis=dict(
-                    categoryorder="array",
-                    categoryarray=price_counts["Price"].tolist()
-               )
-    )
-    
+    # figure.update_layout(
+    #        xaxis=dict(
+    #                 categoryorder="array",
+    #                 categoryarray=price_counts["Price"].tolist()
+    #            )
+    # )
+
     st.plotly_chart(figure, use_container_width=True)
 
 
