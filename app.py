@@ -1020,6 +1020,9 @@ st.title("Game Development MVP Planning Assistant")
 st.write("""Enter a game concept to identify similar Steam games, common gameplay
             characteristics, frequently occurring Steam features, and potential features to consider for an MVP.
           """)
+st.info(
+    "Want to customize your results? Open the **Adjustments** menu in the sidebar."
+)
 
 st.divider()
 
