@@ -787,6 +787,9 @@ def game_concept(input_text, similarity_weight, tag_weight, top_games):
 
     show_memory("After tag frequency")
 
+    st.write("Analysis Results:")
+    st.dataframe(analysis_results)
+    
     # Market summary
     market_data = market_summary(analysis_results)
 
