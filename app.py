@@ -561,16 +561,6 @@ def community_tag_frequency_context(df):
         )
     return tag_context, tag_frequency
 
-def market_summary(df):
-    # market_data = {}
-
-    # market_data['average_price'] = df['initial_price'].mean()
-    # market_data['median_price'] = df['initial_price'].median()
-    # market_data['minimum_price'] = df['initial_price'].min()
-    # market_data['maximum_price'] = df['initial_price'].max()
-
-    market_data = df[["appid",'initial_price','current_price','is_free','coming_soon','release_year','release_month','release_day']]
-    return market_data
 
 #---------------------TEST------------------------------------------------------
 def test_gemini_response():
@@ -793,7 +783,7 @@ def game_concept(input_text, similarity_weight, tag_weight, top_games):
     # st.dataframe(analysis_results)
 
     # Market summary
-    market_data = market_summary(analysis_results)
+    market_data = analysis_results[["appid",'initial_price','current_price','is_free','coming_soon','release_year','release_month','release_day']]
     
     show_memory("After market summary")
 
@@ -930,6 +920,16 @@ def price_histogram(market_data):
     figure.update_layout(xaxis_title="Price ($)", yaxis_title="Number of Games")
     st.plotly_chart(figure, use_container_width=True)
 
+def market_summary(df):
+    market_data = {}
+
+    market_data['average_price'] = df['initial_price'].mean()
+    market_data['median_price'] = df['initial_price'].median()
+    market_data['minimum_price'] = df['initial_price'].min()
+    market_data['maximum_price'] = df['initial_price'].max()
+
+    # market_data = df[["appid",'initial_price','current_price','is_free','coming_soon','release_year','release_month','release_day']]
+    return market_data
 #----------------Streamlit----------------------------------------------------------------------------------------------------------------
 st.set_page_config(page_title="Game Development MVP Planning Tool", page_icon="placeholder",layout="wide")
 
@@ -1076,25 +1076,27 @@ if st.button("Analyze Game Concept", type="primary"):
 
         st.subheader("Market & Pricing Among Similar Games")
         price_histogram(market_data)
-        # col1, col2, col3, col4  = st.columns(4)
-        # col1.metric(
-        #     "Median Price",
-        #     f"${market_data['median_price']:.2f}"
-        # )
-        # col2.metric(
-        #     "Average Price",
-        #     f"${market_data['average_price']:.2f}"
-        # )
+        
+        price_data = market_summary(market_data)
+        col1, col2, col3, col4  = st.columns(4)
+        col1.metric(
+            "Median Price",
+            f"${price_data['median_price']:.2f}"
+        )
+        col2.metric(
+            "Average Price",
+            f"${price_data['average_price']:.2f}"
+        )
 
-        # col3.metric(
-        #     "Lowest Price",
-        #     f"${market_data['minimum_price']:.2f}"
-        # )
+        col3.metric(
+            "Lowest Price",
+            f"${price_data['minimum_price']:.2f}"
+        )
 
-        # col4.metric(
-        #     "Highest Price",
-        #     f"${market_data['maximum_price']:.2f}"
-        # )
+        col4.metric(
+            "Highest Price",
+            f"${price_data['maximum_price']:.2f}"
+        )
 
 
         st.subheader("Common Features Across Similar Games")
