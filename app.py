@@ -919,8 +919,14 @@ def price_histogram(market_data):
     price_data["Price"] = np.where(
         price_data["is_free"] == 1,
         "Free",
-        price_data["initial_price"].apply(
-            lambda x: f"${x:.2f}" if pd.notna(x) else "Unknown"
+        np.where(
+            (price_data["coming_soon"] == 0) &
+            (price_data["is_free"] == 0) &
+            (price_data["initial_price"] == 0),
+            "Not Available",
+            price_data["initial_price"].apply(
+                lambda x: f"${x:.2f}" if pd.notna(x) else "Unknown"
+            )
         )
     )
 
@@ -955,8 +961,8 @@ def price_histogram(market_data):
     figure.update_traces(width=1.0)
     figure.update_xaxes(
         tickmode="array",
-        tickvals=[4.99,9.99, 19.99, 29.99, 39.99, 49.99, 59.99, 69.99],
-        ticktext=["$4.99","$9.99", "$19.99", "$29.99", "$39.99","49.99","59.99","69.99"]
+        tickvals=[4.99,9.99, 14.99, 19.99, 29.99, 39.99, 49.99, 59.99, 69.99],
+        ticktext=["$4.99","$9.99", "$14.99","$19.99", "$29.99", "$39.99","49.99","59.99","69.99"]
     )
     st.plotly_chart(figure, use_container_width=True)
 
