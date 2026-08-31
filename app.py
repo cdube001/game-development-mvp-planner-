@@ -1012,7 +1012,7 @@ def market_summary(df):
     # market_data = df[["appid",'initial_price','current_price','is_free','coming_soon','release_year','release_month','release_day']]
     return market_data
 #----------------Streamlit----------------------------------------------------------------------------------------------------------------
-st.set_page_config(page_title="Game Development MVP Planning Tool", page_icon="placeholder",layout="wide")
+st.set_page_config(page_title="Game Development MVP Planning Tool", layout="wide", initial_sidebar_state="collapsed")
 
 
 st.title("Game Development MVP Planning Assistant")
