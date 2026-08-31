@@ -1021,7 +1021,7 @@ st.write("""Enter a game concept to identify similar Steam games, common gamepla
             characteristics, frequently occurring Steam features, and potential features to consider for an MVP.
           """)
 st.info(
-    "Want to customize your results? Open the **Adjustments** menu in the sidebar."
+    "Customize your recommendations: Open the **Adjustments** menu in the sidebar."
 )
 
 st.divider()
