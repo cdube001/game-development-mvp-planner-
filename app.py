@@ -946,10 +946,6 @@ def price_histogram(market_data):
         ~price_counts["Price"].isin(["Free", "Not Available"])
     ].copy()
 
-    st.write(free_data)
-    st.write(not_available_data)
-    st.write(paid_data)
-
     paid_data["sort_price"] = (paid_data["Price"].str.replace("$","", regex=False).astype(float))
 
     paid_data = paid_data.sort_values("sort_price")
@@ -993,7 +989,7 @@ def price_histogram(market_data):
     status_figure.update_traces(textinfo="label+percent")
     
 
-    col1, col2 = st.columns([1.3, 1])
+    col1, col2 = st.columns([1.3, 0.7])
     with col1:
         st.plotly_chart(figure, use_container_width=True)
     with col2:
