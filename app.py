@@ -924,7 +924,7 @@ def dashboard_section(title, content):
     )
 
 def price_histogram(market_data):
-    price_data = market_data[market_data["initial_price"]].copy()
+    price_data = market_data[market_data["initial_price"].notna()].copy()
 
     figure = px.histogram(price_data, x="initial_price", nbins=20,title="Price Distribution Among Similar Games", labels={"current_price": " Price($)"})
     figure.update_layout(xaxis_title="Price ($)", yaxis_title="Number of Games")
