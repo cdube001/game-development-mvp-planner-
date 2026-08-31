@@ -11,6 +11,7 @@ import re
 import json
 import requests
 import psutil
+import plotly.express as px
 
 from google import genai
 # from google.colab import userdata
@@ -922,6 +923,13 @@ def dashboard_section(title, content):
         unsafe_allow_html=True
     )
 
+def price_histogram(market_data):
+    price_data = market_data[market_data["initial_price"]].copy()
+
+    figure = px.histogram(price_data, x="initial_price", nbins=20,title="Price Distribution Among Similar Games", labels={"current_price": " Price($)"})
+    figure.update_layout(xaxis_title="Price ($)", yaxis_title="Number of Games")
+    st.plotly_chat(figure, use_container_width=True)
+
 #----------------Streamlit----------------------------------------------------------------------------------------------------------------
 st.set_page_config(page_title="Game Development MVP Planning Tool", page_icon="placeholder",layout="wide")
 
@@ -1067,7 +1075,7 @@ if st.button("Analyze Game Concept", type="primary"):
             )
 
         st.subheader("Market & Pricing Among Similar Games")
-        st.dataframe(market_data)
+        price_histogram(market_data)
         # col1, col2, col3, col4  = st.columns(4)
         # col1.metric(
         #     "Median Price",
