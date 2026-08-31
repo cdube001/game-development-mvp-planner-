@@ -978,7 +978,9 @@ def price_histogram(market_data):
         price_data["is_free"] == 1,
         "Free",
         np.where(
-            price_data["coming_soon"] == 1,
+            (price_data["is_free"] == 0) &
+            (price_data["coming_soon"] == 0) &
+            (price_data["initial_price"] == 0),
             "Not Available",
             "Paid"
         )
