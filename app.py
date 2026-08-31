@@ -958,12 +958,14 @@ def price_histogram(market_data):
 
 
     figure = px.bar(price_counts, x="Price", y="Games",title="Price Distribution Among Similar Games", labels={"Price": " Price($)", "Games": "Number of Games"})
-    # figure.update_layout(
-    #        xaxis=dict(
-    #                 categoryorder="array",
-    #                 categoryarray=price_counts["Price"].tolist()
-    #            )
-    # )
+
+    figure.update_layout(
+           xaxis=dict(
+                    categoryorder="array",
+                    categoryarray=price_counts["Price"].tolist()
+               )
+    )
+
     figure.update_traces(width=1.0)
     figure.update_xaxes(
         tickmode="array",
@@ -972,7 +974,7 @@ def price_histogram(market_data):
     )
     st.plotly_chart(figure, use_container_width=True)
 
-    price_data["Pricing Status"] = np.where(
+    price_data["Pricing_Status"] = np.where(
         price_data["is_free"] == 1,
         "Free",
         np.where(
