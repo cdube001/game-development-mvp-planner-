@@ -932,8 +932,13 @@ def price_histogram(market_data):
 
     price_counts.columns = ["Price", "Games"]
 
+     # Separate Free and paid prices
+    free_data = price_counts[price_counts["Price"] == "Free"]
+
+    paid_data = price_counts[price_counts["Price"] != "Free"].copy()
     
-    st.write(price_counts)
+    st.write(free_data)
+    st.write(paid_data)
     # figure = px.histogram(price_data, x="initial_price", nbins=20,title="Price Distribution Among Similar Games", labels={"current_price": " Price($)"})
     # figure.update_layout(xaxis_title="Price ($)", yaxis_title="Number of Games")
     # st.plotly_chart(figure, use_container_width=True)
