@@ -922,6 +922,7 @@ def price_histogram(market_data):
         price_data["initial_price"].apply(
             lambda x: f"${x:.2f}" if pd.notna(x) else "Unknown"
         )
+    )
     
     st.write(price_data)
     # figure = px.histogram(price_data, x="initial_price", nbins=20,title="Price Distribution Among Similar Games", labels={"current_price": " Price($)"})
