@@ -972,7 +972,7 @@ def price_histogram(market_data):
         tickvals=[4.99,9.99, 14.99, 19.99, 29.99, 39.99, 49.99, 59.99, 69.99],
         ticktext=["$4.99","$9.99", "$14.99","$19.99", "$29.99", "$39.99","$49.99","$59.99","$69.99"]
     )
-    st.plotly_chart(figure, use_container_width=True)
+    
 
     price_data["Pricing_Status"] = np.where(
         price_data["is_free"] == 1,
@@ -991,17 +991,14 @@ def price_histogram(market_data):
     status_figure = px.pie(status_counts,names="Status",values="Games",title="Pricing Status Among Similar Games")
 
     status_figure.update_traces(textinfo="label+percent")
-    st.plotly_chart(status_figure, use_container_width=True)
-
-    # col1, col2, col3 = st.columns(3)
-
-    # paid_count = price_data["Price"].str.startswith("$").sum()
-    # free_count = (price_data["Price"] == "Free").sum()
-    # not_available_count = (price_data["Price"] == "Not Available").sum()
     
-    # col1.metric("Paid Games", paid_count)
-    # col2.metric("Free Games", free_count)
-    # col3.metric("Not Available", not_available_count)
+
+    col1, col2 = st.columns([1.3, 1])
+    with col1:
+        st.plotly_chart(figure, use_container_width=True)
+    with col2:
+        st.plotly_chart(status_figure, use_container_width=True)
+
 
 
 
