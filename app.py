@@ -987,7 +987,10 @@ def price_histogram(market_data):
     status_figure = px.pie(status_counts,names="Status",values="Games",title="Pricing Status Among Similar Games")
 
     status_figure.update_traces(textinfo="label+percent")
-    
+
+    status_figure.update_layout(
+        showlegend=False
+    )
 
     col1, col2 = st.columns([1.3, 0.7])
     with col1:
