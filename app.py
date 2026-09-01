@@ -1028,6 +1028,7 @@ st.divider()
 
 st.subheader("Game Concept")
 
+steamspy_data_updated_date = "July 28, 2026"
 
 with st.sidebar:
 
@@ -1156,19 +1157,10 @@ if st.button("Analyze Game Concept", type="primary"):
                          width="stretch",
                          hide_index=True
                     )
-            st.caption(
-                "Ranks the most engaged games among the 100 most similar games retrieved. "
-                "Engagement Score combines current concurrent players and Steam review volume to highlight games with stronger player engagement."
-            )
-            st.caption(
-                f"Engagement Score combines concurrent players "
-                f"({engagement_ccu_weight}%) and Steam review activity "
-                f"({engagement_review_weight}%). "
-                f"Adjust these weights in the sidebar to change the emphasis."
-            )
             st.caption("Ranks the most engaged games among the 100 most similar games retrieved. "
                 f"The Engagement Score combines current concurrent players ({engagement_ccu_weight}%)" 
                 f"and Steam review volume ({engagement_review_weight}%) to highlight games with stronger overall player engagement." 
+                f"Concurrent player counts are based on data updated as of {steamspy_data_updated_date}. "
                 "Adjust these weights in the sidebar to change the emphasis."
             )
 
