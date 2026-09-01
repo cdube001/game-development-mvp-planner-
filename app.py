@@ -1036,14 +1036,16 @@ with st.sidebar:
     with st.expander("Adjustments", expanded=False):
         top_games = st.slider("Number of Games", 3,20,5)
         similarity_weight = st.slider("Semantic Similarity Weight vs Tag Similarity Weight", 0, 100, 70)
-        engagement_ccu_weight = st.slider("Steam Review Weight vs Concurrent Player Weight", 0, 100, 40)
+        engagement_ccu_weight = st.slider("Concurrent Player Weight vs Steam Review Weight", 0, 100, 40)
         
         engagement_review_weight = 100 - engagement_ccu_weight
         tag_weight = 100 - similarity_weight
 
+    st.write(f"Games Displayed: {top_games}")
     st.write(f"Semantic Similarity: {similarity_weight}%")
     st.write(f"Community Tags: {tag_weight}%")
-    st.write(f"Games Displayed: {top_games}")
+    st.write(f"Concurrent Player Weight: {engagement_ccu_weight}%")
+    st.write(f"Steam Review Weight : {engagement_review_weight}%")
     # selected_attribute = st.selectbox("Attribute: ", 1,index=0)
 
 user_concept_input = st.text_area("Describe a game concept:", height=150, placeholder="Enter here...")
