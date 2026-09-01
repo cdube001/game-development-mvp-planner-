@@ -1166,6 +1166,11 @@ if st.button("Analyze Game Concept", type="primary"):
                 f"({engagement_review_weight}%). "
                 f"Adjust these weights in the sidebar to change the emphasis."
             )
+            st.caption("Ranks the most engaged games among the 100 most similar games retrieved. "
+                f"The Engagement Score combines current concurrent players ({engagement_ccu_weight}%)" 
+                f"and Steam review volume ({engagement_review_weight}%) to highlight games with stronger overall player engagement." 
+                "Adjust these weights in the sidebar to change the emphasis."
+            )
 
         st.subheader("Market & Pricing Among Similar Games")
         price_histogram(market_data)
