@@ -663,7 +663,7 @@ def test_gemini_response():
         ]
     }
 
-def game_concept(input_text, similarity_weight, tag_weight, top_games):
+def game_concept(input_text, similarity_weight, tag_weight, engagement_ccu_weight, engagement_review_weight, top_games):
 
     show_memory("Game concept START")
 
@@ -754,8 +754,8 @@ def game_concept(input_text, similarity_weight, tag_weight, top_games):
     )
 
     analysis_results['Engagement Score'] = (
-        0.4 * analysis_results['CCU Score'] +
-        0.6 * analysis_results['Review Score']
+        (engagement_ccu_weight/100) * analysis_results['CCU Score'] +
+        (engagement_review_weight/100) * analysis_results['Review Score']
     )
 
     popular_similar_games = (
@@ -1034,10 +1034,12 @@ with st.sidebar:
     #Filters to implement weight adjustment for semantic score and tag similarity
     #Possibly incorporate popularity (recommendations as an optional filter)
     with st.expander("Adjustments", expanded=False):
-        similarity_weight = st.slider("Semantic Similarity", 0, 100, 70)
         top_games = st.slider("Number of Games", 3,20,5)
-
-    tag_weight = 100 - similarity_weight
+        similarity_weight = st.slider("Semantic Similarity Weight vs Tag Similarity Weight", 0, 100, 70)
+        engagement_ccu_weight = st.slider("Steam Review Weight vs Concurrent Player Weight", 0, 100, 40)
+        
+        engagement_review_weight = 100 - engagement_ccu_weight
+        tag_weight = 100 - similarity_weight
 
     st.write(f"Semantic Similarity: {similarity_weight}%")
     st.write(f"Community Tags: {tag_weight}%")
@@ -1057,8 +1059,12 @@ if st.button("Analyze Game Concept", type="primary"):
                   [user_concept_input],
                   similarity_weight,
                   tag_weight,
+                  engagement_ccu_weight,
+                  engagement_review_weight,
                   top_games
+
           )
+
         show_memory("End game_concept")
         if response is not None:
             games_response = response["retrieved_similar_games"]
@@ -1124,11 +1130,6 @@ if st.button("Analyze Game Concept", type="primary"):
             st.caption("Ranks games by their similarity to your proposed game concept based on the retrieval model.")
 
         with col2:
-            # game_chart_data = rag_results.sort_values("final_score", ascending=False).copy()
-            # game_chart_data = game_chart_data.rename(columns={"name": "Games", "final_score": "Match Score"})
-            # game_chart_data["Match Score"] = game_chart_data["Match Score"] * 100
-            # game_chart_data = game_chart_data[["Games", "Match Score"]]
-            # st.bar_chart(game_chart_data,x="Games",y="Match Score", horizontal=True, sort="-Match Score")
             st.write("Most Engaged Similar Titles:")
 
             popular_similar_games = popular_similar_games.rename(columns={
@@ -1156,6 +1157,12 @@ if st.button("Analyze Game Concept", type="primary"):
             st.caption(
                 "Ranks the most engaged games among the 100 most similar games retrieved. "
                 "Engagement Score combines current concurrent players and Steam review volume to highlight games with stronger player engagement."
+            )
+            st.caption(
+                f"Engagement Score combines concurrent players "
+                f"({engagement_ccu_weight}%) and Steam review activity "
+                f"({engagement_review_weight}%). "
+                f"Adjust these weights in the sidebar to change the emphasis."
             )
 
         st.subheader("Market & Pricing Among Similar Games")
