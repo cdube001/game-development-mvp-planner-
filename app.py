@@ -1196,8 +1196,7 @@ if st.button("Analyze Game Concept", type="primary"):
     st.subheader("Market & Pricing Among Similar Games")
     st.write("Summarizes the pricing of games similar to your concept to help identify the current market range.")
     price_histogram(market_data)
-
-    st.dataframe(display_results)
+    st.dataframe(rag_results)
 
     price_data = market_summary(market_data)
     col1, col2, col3, col4  = st.columns(4)
