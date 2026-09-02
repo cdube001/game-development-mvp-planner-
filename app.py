@@ -1017,14 +1017,15 @@ st.set_page_config(page_title="Game Development MVP Planning Tool", layout="wide
 
 st.title("Game Development MVP Planning Assistant")
 
-st.write("""Describe your game concept\n
+st.info("""Describe your game concept\n
             Enter a brief description of the game you want to develop. 
             Include the genre, core gameplay, and main features you have in mind. 
-            The more specific your concept, the more relevant the recommendations will be.
+            The more specific your concept, the more relevant the recommendations will be.\n
+            Customize your recommendations: Open the **Adjustments** menu in the sidebar.
           """)
-st.info(
-    "Customize your recommendations: Open the **Adjustments** menu in the sidebar."
-)
+# st.info(
+#     "Customize your recommendations: Open the **Adjustments** menu in the sidebar."
+# )
 
 st.divider()
 
