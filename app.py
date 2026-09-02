@@ -1052,6 +1052,11 @@ with st.sidebar:
     st.write(f"Steam Review Weight : {engagement_review_weight}%")
     # selected_attribute = st.selectbox("Attribute: ", 1,index=0)
 
+example_concept = (
+    "A cooperative survival game where 2–4 players explore an abandoned "
+    "space station, gather resources, craft equipment, and work together "
+    "to survive increasingly dangerous alien creatures."
+)
 
 user_concept_input = st.text_area(
     "Describe your game concept:",
@@ -1068,226 +1073,230 @@ user_concept_input = st.text_area(
 show_memory("Startup")
 
 if st.button("Analyze Game Concept", type="primary"):
-    if not user_concept_input.strip():
-        st.warning("Please enter a game concept.")
+    concept = user_concept_input.strip()
+
+    if not concept:
+        # st.warning("Please enter a game concept.")
+        concept = example_concept
+
+    
+    with st.spinner("Analyzing your game concept..."):
+        response, list_features, feature_group_results, tag_frequency, rag_results, market_data, popular_similar_games = game_concept(
+                [concept],
+                similarity_weight,
+                tag_weight,
+                engagement_ccu_weight,
+                engagement_review_weight,
+                top_games
+
+        )
+
+    show_memory("End game_concept")
+    if response is not None:
+        games_response = response["retrieved_similar_games"]
+        characteristics_response = response["common_community_highlighted_gameplay_characteristics"]
+        features_response = response["frequent_steam_features"]
+        recommendations_response = response["potential_gameplay_features_worth_considering"]
     else:
-        with st.spinner("Analyzing your game concept..."):
-          response, list_features, feature_group_results, tag_frequency, rag_results, market_data, popular_similar_games = game_concept(
-                  [user_concept_input],
-                  similarity_weight,
-                  tag_weight,
-                  engagement_ccu_weight,
-                  engagement_review_weight,
-                  top_games
-
-          )
-
-        show_memory("End game_concept")
-        if response is not None:
-            games_response = response["retrieved_similar_games"]
-            characteristics_response = response["common_community_highlighted_gameplay_characteristics"]
-            features_response = response["frequent_steam_features"]
-            recommendations_response = response["potential_gameplay_features_worth_considering"]
-        else:
-            recommendations_response = None
+        recommendations_response = None
 
 
 
-        display_results = rag_results[[
-                              "appid",
-                              "name",
-                              "release_year",
-                              "combined_score",
-                              "tag_similarity",
-                              "final_score"
-        ]].copy()
+    display_results = rag_results[[
+                            "appid",
+                            "name",
+                            "release_year",
+                            "combined_score",
+                            "tag_similarity",
+                            "final_score"
+    ]].copy()
 
 
 
-        display_results = display_results.rename(columns={
-            "name": "Games",
+    display_results = display_results.rename(columns={
+        "name": "Games",
+        "release_year": "Released",
+        "combined_score": "Semantic Score",
+        "tag_similarity": "Tag Similarity",
+        "final_score": "Match Score"
+    })
+
+    display_results["Steam Link"] = ("https://store.steampowered.com/app/" + display_results["appid"].astype(int).astype(str)+ "/")
+
+    group_chart_data = feature_group_results.copy()
+    group_chart_data["Feature Group"] = (
+        group_chart_data["feature_group"]
+        .str.replace("_features", "", regex=False)
+        .str.replace("_", " ")
+        .str.title()
+    )
+
+
+    group_chart_data["Percentage"] = group_chart_data["Percentage"] * 100
+
+
+    st.subheader("Top Similar Games:")
+    col1, col2 = st.columns([1, 1.2])
+
+    with col1:
+        st.write("Titles Most Similar to Concept:")
+        display_results["Match Score"] = (display_results["Match Score"].map(lambda x: f"{x:.0%}"))
+        st.dataframe( display_results[["Games","Released", "Match Score", "Steam Link"]],
+                column_config={
+                "Steam Link": st.column_config.LinkColumn(
+                    "Steam",
+                    display_text="Open Steam"
+                )
+            },
+    
+            width="stretch",
+            hide_index=True
+        )
+
+        st.caption(
+            "Games most similar to your concept based on their descriptions and Steam community tags. "
+            f"Match Score weights semantic similarity ({similarity_weight}%) "
+            f"and community tag similarity ({tag_weight}%) to refine the initial ranking. "
+            "Adjust these weights in the sidebar to change the emphasis."
+        )
+        
+    with col2:
+        st.write("Most Engaged Similar Titles:")
+        st.caption("Among the 100 most similar games, these games show the strongest player engagement based on concurrent players and Steam review activity.")
+
+        popular_similar_games = popular_similar_games.rename(columns={
+            "name": "Game",
+            "ccu": "Concurrent Active Users",
             "release_year": "Released",
-            "combined_score": "Semantic Score",
-            "tag_similarity": "Tag Similarity",
-            "final_score": "Match Score"
+            "review_count": "Steam Reviews"
+
         })
 
-        display_results["Steam Link"] = ("https://store.steampowered.com/app/" + display_results["appid"].astype(int).astype(str)+ "/")
 
-        group_chart_data = feature_group_results.copy()
-        group_chart_data["Feature Group"] = (
-            group_chart_data["feature_group"]
-            .str.replace("_features", "", regex=False)
-            .str.replace("_", " ")
-            .str.title()
-        )
+        popular_similar_games['Engagement Score'] = (popular_similar_games['Engagement Score'].map(lambda x: f"{x:.0%}"))
+        popular_similar_games["Steam Link"] = ("https://store.steampowered.com/app/" + popular_similar_games["appid"].astype(int).astype(str)+ "/")
 
-
-        group_chart_data["Percentage"] = group_chart_data["Percentage"] * 100
-
-
-        st.subheader("Top Similar Games:")
-        col1, col2 = st.columns([1, 1.2])
-
-        with col1:
-            st.write("Titles Most Similar to Concept:")
-            display_results["Match Score"] = (display_results["Match Score"].map(lambda x: f"{x:.0%}"))
-            st.dataframe( display_results[["Games","Released", "Match Score", "Steam Link"]],
-                    column_config={
-                    "Steam Link": st.column_config.LinkColumn(
-                        "Steam",
-                        display_text="Open Steam"
-                    )
-                },
-        
-                width="stretch",
-                hide_index=True
-            )
-
-            st.caption(
-                "Games most similar to your concept based on their descriptions and Steam community tags. "
-                f"Match Score weights semantic similarity ({similarity_weight}%) "
-                f"and community tag similarity ({tag_weight}%) to refine the initial ranking. "
-                "Adjust these weights in the sidebar to change the emphasis."
-            )
-            
-        with col2:
-            st.write("Most Engaged Similar Titles:")
-            st.caption("Among the 100 most similar games, these games show the strongest player engagement based on concurrent players and Steam review activity.")
-
-            popular_similar_games = popular_similar_games.rename(columns={
-                "name": "Game",
-                "ccu": "Concurrent Active Users",
-                "release_year": "Released",
-                "review_count": "Steam Reviews"
-
-            })
-
-
-            popular_similar_games['Engagement Score'] = (popular_similar_games['Engagement Score'].map(lambda x: f"{x:.0%}"))
-            popular_similar_games["Steam Link"] = ("https://store.steampowered.com/app/" + popular_similar_games["appid"].astype(int).astype(str)+ "/")
-
-            st.dataframe(popular_similar_games[['Game','Released', 'Concurrent Active Users', 'Steam Reviews', 'Engagement Score', "Steam Link"]],
-                         column_config={
-                              "Steam Link": st.column_config.LinkColumn(
-                              "Steam",
-                              display_text="Open Steam"
-                            )
-                         },
-                         width="stretch",
-                         hide_index=True
-                    )
-            st.caption("Ranks the most engaged games among the 100 most similar games retrieved. "
-                f"The Engagement Score combines current concurrent players ({engagement_ccu_weight}%) " 
-                f"and Steam review volume ({engagement_review_weight}%) to highlight games with stronger overall player engagement. " 
-                f"Concurrent player counts are based on data updated as of {steamspy_data_updated_date}. "
-                "Adjust these weights in the sidebar to change the emphasis."
-            )
-
-        st.subheader("Market & Pricing Among Similar Games")
-        st.write("Summarizes the pricing of games similar to your concept to help identify the current market range.")
-        price_histogram(market_data)
-
-        price_data = market_summary(market_data)
-        col1, col2, col3, col4  = st.columns(4)
-        col1.metric(
-            "Median Price",
-            f"${price_data['median_price']:.2f}"
-        )
-        col2.metric(
-            "Average Price",
-            f"${price_data['average_price']:.2f}"
-        )
-
-        col3.metric(
-            "Lowest Price",
-            f"${price_data['minimum_price']:.2f}"
-        )
-
-        col4.metric(
-            "Highest Price",
-            f"${price_data['maximum_price']:.2f}"
-        )
-
-
-        st.subheader("Common Features Across Similar Games")
-
-        st.caption("Shows gameplay and platform features frequently found among the games most similar to your concept.")
-
-        col1, col2 = st.columns([1.2, 1])
-        with col1:
-
-            st.bar_chart(
-                group_chart_data,
-                x="Feature Group",
-                y="Percentage",
-                horizontal=True
-            )
-        with col2:
-            st.write("Feature Breakdown")
-
-            for group in feature_group_results["feature_group"]:
-
-                group_data = list_features[
-                    list_features["feature_group"] == group
-                ].sort_values(
-                    "percentage",
-                    ascending=False
-                )
-
-                group_name = group.replace("_", " ").title()
-
-                with st.expander(group_name):
-
-                    display_data = group_data[
-                        ["categories", "game_count", "percentage"]
-                    ].copy()
-
-                    display_data["percentage"] = (
-                        display_data["percentage"]
-                        .map(lambda x: f"{x:.0%}")
-                    )
-
-                    display_data = display_data.rename(
-                        columns={
-                            "categories": "Feature",
-                            "game_count": "Similar Games",
-                            "percentage": "Frequency"
-                        }
-                    )
-
-                    st.dataframe(
-                        display_data,
+        st.dataframe(popular_similar_games[['Game','Released', 'Concurrent Active Users', 'Steam Reviews', 'Engagement Score', "Steam Link"]],
+                        column_config={
+                            "Steam Link": st.column_config.LinkColumn(
+                            "Steam",
+                            display_text="Open Steam"
+                        )
+                        },
                         width="stretch",
                         hide_index=True
-                    )
-
-
-
-
-
-        st.subheader("Common Community Tags:")
-        st.caption("Tags frequently associated with the games most similar to your concept.")
-
-        tags_chart_data = tag_frequency.sort_values("game_frequency", ascending=False).head(15).copy()
-        tags_chart_data = tags_chart_data.rename(columns={"tag_names": "Community Tags", "game_frequency": "Games"})
-        st.bar_chart(tags_chart_data,x="Community Tags",y="Games", horizontal=True, sort="-Games")
-
-
-        st.subheader("Potential Gameplay Features Worth Considering")
-        # st.caption("Recommendations generated from the retrieved games and your proposed game concept.")
-        st.caption(
-            "AI-generated recommendations informed by the retrieved games "
-            "and your proposed game concept. Recommendations are suggestions, "
-            "not features directly observed in every retrieved game."
+                )
+        st.caption("Ranks the most engaged games among the 100 most similar games retrieved. "
+            f"The Engagement Score combines current concurrent players ({engagement_ccu_weight}%) " 
+            f"and Steam review volume ({engagement_review_weight}%) to highlight games with stronger overall player engagement. " 
+            f"Concurrent player counts are based on data updated as of {steamspy_data_updated_date}. "
+            "Adjust these weights in the sidebar to change the emphasis."
         )
-        if recommendations_response is not None:
-                for item in recommendations_response:
-                      with st.container(border=True):
-                          st.markdown(f"<p style='font-size:18px; font-weight:600; margin-bottom:4px;'> {item['recommendation']}</p>",unsafe_allow_html=True)
-                          st.write(item["details"])
-        else:
-                st.warning("AI-generated recommendations are temporarily unavailable.")           
+
+    st.subheader("Market & Pricing Among Similar Games")
+    st.write("Summarizes the pricing of games similar to your concept to help identify the current market range.")
+    price_histogram(market_data)
+
+    price_data = market_summary(market_data)
+    col1, col2, col3, col4  = st.columns(4)
+    col1.metric(
+        "Median Price",
+        f"${price_data['median_price']:.2f}"
+    )
+    col2.metric(
+        "Average Price",
+        f"${price_data['average_price']:.2f}"
+    )
+
+    col3.metric(
+        "Lowest Price",
+        f"${price_data['minimum_price']:.2f}"
+    )
+
+    col4.metric(
+        "Highest Price",
+        f"${price_data['maximum_price']:.2f}"
+    )
+
+
+    st.subheader("Common Features Across Similar Games")
+
+    st.caption("Shows gameplay and platform features frequently found among the games most similar to your concept.")
+
+    col1, col2 = st.columns([1.2, 1])
+    with col1:
+
+        st.bar_chart(
+            group_chart_data,
+            x="Feature Group",
+            y="Percentage",
+            horizontal=True
+        )
+    with col2:
+        st.write("Feature Breakdown")
+
+        for group in feature_group_results["feature_group"]:
+
+            group_data = list_features[
+                list_features["feature_group"] == group
+            ].sort_values(
+                "percentage",
+                ascending=False
+            )
+
+            group_name = group.replace("_", " ").title()
+
+            with st.expander(group_name):
+
+                display_data = group_data[
+                    ["categories", "game_count", "percentage"]
+                ].copy()
+
+                display_data["percentage"] = (
+                    display_data["percentage"]
+                    .map(lambda x: f"{x:.0%}")
+                )
+
+                display_data = display_data.rename(
+                    columns={
+                        "categories": "Feature",
+                        "game_count": "Similar Games",
+                        "percentage": "Frequency"
+                    }
+                )
+
+                st.dataframe(
+                    display_data,
+                    width="stretch",
+                    hide_index=True
+                )
+
+
+
+
+
+    st.subheader("Common Community Tags:")
+    st.caption("Tags frequently associated with the games most similar to your concept.")
+
+    tags_chart_data = tag_frequency.sort_values("game_frequency", ascending=False).head(15).copy()
+    tags_chart_data = tags_chart_data.rename(columns={"tag_names": "Community Tags", "game_frequency": "Games"})
+    st.bar_chart(tags_chart_data,x="Community Tags",y="Games", horizontal=True, sort="-Games")
+
+
+    st.subheader("Potential Gameplay Features Worth Considering")
+    # st.caption("Recommendations generated from the retrieved games and your proposed game concept.")
+    st.caption(
+        "AI-generated recommendations informed by the retrieved games "
+        "and your proposed game concept. Recommendations are suggestions, "
+        "not features directly observed in every retrieved game."
+    )
+    if recommendations_response is not None:
+            for item in recommendations_response:
+                    with st.container(border=True):
+                        st.markdown(f"<p style='font-size:18px; font-weight:600; margin-bottom:4px;'> {item['recommendation']}</p>",unsafe_allow_html=True)
+                        st.write(item["details"])
+    else:
+            st.warning("AI-generated recommendations are temporarily unavailable.")           
 
 st.divider()
 show_memory("End dashboard")
