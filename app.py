@@ -1052,19 +1052,17 @@ with st.sidebar:
     st.write(f"Steam Review Weight : {engagement_review_weight}%")
     # selected_attribute = st.selectbox("Attribute: ", 1,index=0)
 
-example_concept = (
-    "A cooperative survival game where 2–4 players explore an abandoned "
-    "space station, gather resources, craft equipment, and work together "
-    "to survive increasingly dangerous alien creatures."
-)
-
-if "concept" not in st.session_state:
-    st.session_state.concept = example_concept
 
 user_concept_input = st.text_area(
-     "Describe your game concept:", height=150, 
-     label_visibility="collapsed",
-     key="concept"
+    "Describe your game concept:",
+    height=150,
+    placeholder=(
+        "Example: A cooperative survival game where 2–4 players "
+        "explore an abandoned space station, gather resources, "
+        "craft equipment, and work together to survive increasingly "
+        "dangerous alien creatures. "
+    ),
+    label_visibility="collapsed"
 )
 
 show_memory("Startup")
