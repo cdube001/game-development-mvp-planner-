@@ -783,7 +783,7 @@ def game_concept(input_text, similarity_weight, tag_weight, engagement_ccu_weigh
     # st.dataframe(analysis_results)
 
     # Market summary
-    market_data = analysis_results[["appid",'initial_price','current_price','is_free','coming_soon','release_year','release_month','release_day']]
+    market_data = analysis_results[["appid",'name','initial_price','current_price','is_free','coming_soon','release_year','release_month','release_day']]
     
     show_memory("After market summary")
 
@@ -1196,7 +1196,6 @@ if st.button("Analyze Game Concept", type="primary"):
     st.subheader("Market & Pricing Among Similar Games")
     st.write("Summarizes the pricing of games similar to your concept to help identify the current market range.")
     price_histogram(market_data)
-    st.dataframe(rag_results)
 
     price_data = market_summary(market_data)
     col1, col2, col3, col4  = st.columns(4)
@@ -1218,11 +1217,10 @@ if st.button("Analyze Game Concept", type="primary"):
     highest_price_appid = market_data.loc[
         market_data["initial_price"].idxmax(), "appid"
     ]
-
-    highest_price_game = rag_results.loc[
-        rag_results["appid"] == highest_price_appid,
-        "Games"
-    ].iloc[0]
+    highest_price_game = market_data.loc[
+        market_data["initial_price"].idxmax(), "name"
+    ]
+    
 
     steam_url = f"https://store.steampowered.com/app/{int(highest_price_appid)}/"
     col4.metric(
