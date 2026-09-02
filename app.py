@@ -1052,7 +1052,7 @@ with st.sidebar:
     st.write(f"Steam Review Weight : {engagement_review_weight}%")
     # selected_attribute = st.selectbox("Attribute: ", 1,index=0)
 
-user_concept_input = st.text_area("Describe your game concept:", height=150, placeholder="e.g., A cooperative survival horror game where 4 players explore an abandoned space station...", label_visibility="collapsed")
+user_concept_input = st.text_area("Describe your game concept:", height=150, placeholder="e.g., A cooperative survival horror game where 4 players explore an abandoned space station...")#, label_visibility="collapsed")
 
 show_memory("Startup")
 
