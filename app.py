@@ -1197,7 +1197,7 @@ if st.button("Analyze Game Concept", type="primary"):
     st.write("Summarizes the pricing of games similar to your concept to help identify the current market range.")
     price_histogram(market_data)
 
-    st.dataframe(market_data)
+    st.dataframe(display_results)
 
     price_data = market_summary(market_data)
     col1, col2, col3, col4  = st.columns(4)
@@ -1219,22 +1219,19 @@ if st.button("Analyze Game Concept", type="primary"):
     highest_price_appid = market_data.loc[
         market_data["initial_price"].idxmax(), "appid"
     ]
+
+    highest_price_game = display_results.loc[
+        display_results["appid"] == highest_price_appid,
+        "Games"
+    ].iloc[0]
+
     steam_url = f"https://store.steampowered.com/app/{int(highest_price_appid)}/"
     col4.metric(
             "Highest Price",
             f"${price_data['maximum_price']:.2f}"
     )
     col4.markdown(
-        # f"""
-        # <div title="{highest_price_game}">
-        #     <div style="font-size: 14px;">Highest Price</div>
-        #     <div style="font-size: 28px; font-weight: 600;">
-        #         ${price_data['maximum_price']:.2f}
-        #     </div>
-        # </div>
-        # """,
-        # unsafe_allow_html=True
-        f"[{highest_price_appid}]({steam_url})"
+        f"[{[highest_price_game]}]({steam_url})"
     )
    
 
