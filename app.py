@@ -1197,6 +1197,8 @@ if st.button("Analyze Game Concept", type="primary"):
     st.write("Summarizes the pricing of games similar to your concept to help identify the current market range.")
     price_histogram(market_data)
 
+    st.dataframe(market_data)
+
     price_data = market_summary(market_data)
     col1, col2, col3, col4  = st.columns(4)
     col1.metric(
@@ -1212,9 +1214,9 @@ if st.button("Analyze Game Concept", type="primary"):
         "Lowest Price",
         f"${price_data['minimum_price']:.2f}"
     )
-
+    
     highest_price_game = market_data.loc[
-        market_data["price"].idxmax(), "name"
+        market_data["initial_price"].idxmax(), "name"
 ]
 
     col4.markdown(
