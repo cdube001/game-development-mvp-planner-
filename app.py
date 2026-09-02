@@ -1017,8 +1017,10 @@ st.set_page_config(page_title="Game Development MVP Planning Tool", layout="wide
 
 st.title("Game Development MVP Planning Assistant")
 
-st.write("""Enter a game concept to identify similar Steam games, common gameplay
-            characteristics, frequently occurring Steam features, and potential features to consider for an MVP.
+st.write("""Describe your game concept\n
+            Enter a brief description of the game you want to develop. 
+            Include the genre, core gameplay, and main features you have in mind. 
+            The more specific your concept, the more relevant the recommendations will be.
           """)
 st.info(
     "Customize your recommendations: Open the **Adjustments** menu in the sidebar."
