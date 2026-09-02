@@ -1132,8 +1132,8 @@ if st.button("Analyze Game Concept", type="primary"):
 
             st.caption(
                 "Games most similar to your concept based on their descriptions and Steam community tags. "
-                f"The Match Score weights semantic similarity ({similarity_weight}%) "
-                f"and community tag similarity ({tag_weight}%), with community tags used to refine the initial semantic ranking. "
+                f"Match Score weights semantic similarity ({similarity_weight}%) "
+                f"and community tag similarity ({tag_weight}%) to refine the initial ranking. "
                 "Adjust these weights in the sidebar to change the emphasis."
             )
             
