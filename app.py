@@ -1214,26 +1214,29 @@ if st.button("Analyze Game Concept", type="primary"):
         "Lowest Price",
         f"${price_data['minimum_price']:.2f}"
     )
-    
-    highest_price_game = market_data.loc[
-        market_data["initial_price"].idxmax(), "appid"
-]
 
-    col4.markdown(
-        f"""
-        <div title="{highest_price_game}">
-            <div style="font-size: 14px;">Highest Price</div>
-            <div style="font-size: 28px; font-weight: 600;">
-                ${price_data['maximum_price']:.2f}
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True
+    
+    highest_price_appid = market_data.loc[
+        market_data["initial_price"].idxmax(), "appid"
+    ]
+    steam_url = f"https://store.steampowered.com/app/{int(highest_price_appid)}/"
+    col4.metric(
+            "Highest Price",
+            f"${price_data['maximum_price']:.2f}"
     )
-    # col4.metric(
-    #     "Highest Price",
-    #     f"${price_data['maximum_price']:.2f}"
-    # )
+    col4.markdown(
+        # f"""
+        # <div title="{highest_price_game}">
+        #     <div style="font-size: 14px;">Highest Price</div>
+        #     <div style="font-size: 28px; font-weight: 600;">
+        #         ${price_data['maximum_price']:.2f}
+        #     </div>
+        # </div>
+        # """,
+        # unsafe_allow_html=True
+        f"[{highest_price_appid}]({steam_url})"
+    )
+   
 
 
     st.subheader("Common Features Across Similar Games")
