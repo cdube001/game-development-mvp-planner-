@@ -1027,9 +1027,9 @@ st.caption("""
 # )
 
 
-st.divider()
+# st.divider()
 
-st.subheader("Game Concept")
+# st.subheader("Game Concept")
 
 steamspy_data_updated_date = "July 28, 2026"
 
