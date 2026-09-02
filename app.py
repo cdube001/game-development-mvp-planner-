@@ -1058,10 +1058,14 @@ example_concept = (
     "to survive increasingly dangerous alien creatures."
 )
 
+if "concept" not in st.session_state:
+    st.session_state.concept = example_concept
+
 user_concept_input = st.text_area(
      "Describe your game concept:", height=150, 
-     value=(example_concept), 
-     label_visibility="collapsed"
+     value=(st.session_state.concept), 
+     label_visibility="collapsed",
+     key="concept"
 )
 
 show_memory("Startup")
