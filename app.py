@@ -1017,15 +1017,15 @@ st.set_page_config(page_title="Game Development MVP Planning Tool", layout="wide
 
 st.title("Game Development MVP Planning Assistant")
 
-st.caption("""Describe your game concept\n
-            Enter a brief description of the game you want to develop. 
+st.markdown("Describe your game concept")
+st.caption("""
+            Enter a brief description of the game you want to develop.  
             Include the genre, core gameplay, and main features you have in mind. 
-            The more specific your concept, the more relevant the recommendations will be.\n
-            Customize your recommendations: Open the **Adjustments** menu in the sidebar.
           """)
 # st.info(
 #     "Customize your recommendations: Open the **Adjustments** menu in the sidebar."
 # )
+
 
 st.divider()
 
@@ -1052,7 +1052,7 @@ with st.sidebar:
     st.write(f"Steam Review Weight : {engagement_review_weight}%")
     # selected_attribute = st.selectbox("Attribute: ", 1,index=0)
 
-user_concept_input = st.text_area("Describe a game concept:", height=150, placeholder="Enter here...")
+user_concept_input = st.text_area("Describe your game concept:", height=150, placeholder="e.g., A cooperative survival horror game where 4 players explore an abandoned space station...", label_visibility="collapsed")
 
 show_memory("Startup")
 
