@@ -1213,10 +1213,25 @@ if st.button("Analyze Game Concept", type="primary"):
         f"${price_data['minimum_price']:.2f}"
     )
 
-    col4.metric(
-        "Highest Price",
-        f"${price_data['maximum_price']:.2f}"
+    highest_price_game = market_data.loc[
+        market_data["price"].idxmax(), "name"
+]
+
+    col4.markdown(
+        f"""
+        <div title="{highest_price_game}">
+            <div style="font-size: 14px;">Highest Price</div>
+            <div style="font-size: 28px; font-weight: 600;">
+                ${price_data['maximum_price']:.2f}
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
     )
+    # col4.metric(
+    #     "Highest Price",
+    #     f"${price_data['maximum_price']:.2f}"
+    # )
 
 
     st.subheader("Common Features Across Similar Games")
