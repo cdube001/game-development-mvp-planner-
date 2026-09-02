@@ -1228,7 +1228,8 @@ if st.button("Analyze Game Concept", type="primary"):
             f"${price_data['maximum_price']:.2f}"
     )
     col4.markdown(
-        f"[{[highest_price_game]}]({steam_url})"
+        f'<a href="{steam_url}" target="_blank">{highest_price_game} ↗</a>',
+        unsafe_allow_html=True
     )
    
 
