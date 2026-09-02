@@ -1130,10 +1130,16 @@ if st.button("Analyze Game Concept", type="primary"):
                 hide_index=True
             )
 
-            st.caption("Ranks games by their similarity to your proposed game concept based on the retrieval model.")
-
+            st.caption(
+                "Games most similar to your concept based on their descriptions and Steam community tags. "
+                f"The Match Score weights semantic similarity ({similarity_weight}%) "
+                f"and community tag similarity ({tag_weight}%), with community tags used to refine the initial semantic ranking. "
+                "Adjust these weights in the sidebar to change the emphasis."
+            )
+            
         with col2:
             st.write("Most Engaged Similar Titles:")
+            st.caption("Among the 100 most similar games, these games show the strongest player engagement based on concurrent players and Steam review activity.")
 
             popular_similar_games = popular_similar_games.rename(columns={
                 "name": "Game",
@@ -1158,13 +1164,14 @@ if st.button("Analyze Game Concept", type="primary"):
                          hide_index=True
                     )
             st.caption("Ranks the most engaged games among the 100 most similar games retrieved. "
-                f"The Engagement Score combines current concurrent players ({engagement_ccu_weight}%)" 
-                f"and Steam review volume ({engagement_review_weight}%) to highlight games with stronger overall player engagement." 
+                f"The Engagement Score combines current concurrent players ({engagement_ccu_weight}%) " 
+                f"and Steam review volume ({engagement_review_weight}%) to highlight games with stronger overall player engagement. " 
                 f"Concurrent player counts are based on data updated as of {steamspy_data_updated_date}. "
                 "Adjust these weights in the sidebar to change the emphasis."
             )
 
         st.subheader("Market & Pricing Among Similar Games")
+        st.write("Summarizes the pricing of games similar to your concept to help identify the current market range.")
         price_histogram(market_data)
 
         price_data = market_summary(market_data)
@@ -1191,7 +1198,7 @@ if st.button("Analyze Game Concept", type="primary"):
 
         st.subheader("Common Features Across Similar Games")
 
-        st.caption("These features are commonly found among the games most similar to your concept.")
+        st.caption("Shows gameplay and platform features frequently found among the games most similar to your concept.")
 
         col1, col2 = st.columns([1.2, 1])
         with col1:
