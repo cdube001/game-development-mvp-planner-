@@ -1063,7 +1063,6 @@ if "concept" not in st.session_state:
 
 user_concept_input = st.text_area(
      "Describe your game concept:", height=150, 
-     value=(st.session_state.concept), 
      label_visibility="collapsed",
      key="concept"
 )
