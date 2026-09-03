@@ -45,8 +45,6 @@ show_memory("After SteamSpy")
 #         hf_base_url + "steam_store_clean.parquet"
 #     )
 
-# Steam_Store_df = load_steam_store()
-# show_memory("After Steam Store")
 
 #--------------Gemini Model-----------------------------------------------------
 api_key = st.secrets["GEMINI_API_KEY"]
@@ -675,6 +673,16 @@ def game_concept(input_text, similarity_weight, tag_weight, engagement_ccu_weigh
 
     show_memory("After combined scoring")
 
+    capitalized_names_df = pd.read_csv(
+        processed_path + "steam_store_original_names.csv"
+    )
+
+    combined_results = combined_results.merge(
+        capitalized_names_df[["appid", "original_name"]],
+        on="appid",
+        how="left"
+    )
+
     # Top 100 for analysis
     analysis_results = combined_results.head(100).copy()
 
@@ -783,7 +791,7 @@ def game_concept(input_text, similarity_weight, tag_weight, engagement_ccu_weigh
     # st.dataframe(analysis_results)
 
     # Market summary
-    market_data = analysis_results[["appid",'name','initial_price','current_price','is_free','coming_soon','release_year','release_month','release_day']]
+    market_data = analysis_results[["appid",'name','original_name','initial_price','current_price','is_free','coming_soon','release_year','release_month','release_day']]
     
     show_memory("After market summary")
 
@@ -1117,6 +1125,7 @@ if st.button("Analyze Game Concept", type="primary"):
     display_results = rag_results[[
                             "appid",
                             "name",
+                            "original_name"
                             "release_year",
                             "combined_score",
                             "tag_similarity",
@@ -1126,7 +1135,7 @@ if st.button("Analyze Game Concept", type="primary"):
 
 
     display_results = display_results.rename(columns={
-        "name": "Games",
+        "original_name": "Games",
         "release_year": "Released",
         "combined_score": "Semantic Score",
         "tag_similarity": "Tag Similarity",
@@ -1177,7 +1186,7 @@ if st.button("Analyze Game Concept", type="primary"):
         st.write("Most Engaged Similar Titles:")
         
         popular_similar_games = popular_similar_games.rename(columns={
-            "name": "Game",
+            "original_name": "Game",
             "ccu": "Concurrent Active Users",
             "release_year": "Released",
             "review_count": "Steam Reviews"
