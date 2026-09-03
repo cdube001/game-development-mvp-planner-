@@ -1042,7 +1042,7 @@ with st.sidebar:
     #Possibly incorporate popularity (recommendations as an optional filter)
     with st.expander("Adjustments", expanded=False):
         adjust_popularity = st.toggle(
-            "Adjust for Popularity",
+            "Disable AI Recommendations",
             value=False
         )
         top_games = st.slider("Number of Games", 3,20,5)
