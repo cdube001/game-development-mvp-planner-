@@ -1041,7 +1041,7 @@ with st.sidebar:
 
     #Filters to implement weight adjustment for semantic score and tag similarity
     #Possibly incorporate popularity (recommendations as an optional filter)
-    with st.expander("Adjustments", expanded=False):
+    with st.expander("Settings", expanded=False):
         with st.form("settings_form"):
             disable_gemini = st.toggle(
                 "Disable AI Recommendations",
