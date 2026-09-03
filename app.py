@@ -997,7 +997,7 @@ def price_histogram(market_data):
     col1, col2 = st.columns([1.3, 0.7])
     with col1:
         st.plotly_chart(figure, use_container_width=True)
-        st.write("Shows the number of similar paid games at each listed price point. Higher bars indicate price points shared by more games.")
+        st.caption("Shows the number of similar paid games at each listed price point. Higher bars indicate price points shared by more games.")
     with col2:
         st.plotly_chart(status_figure, use_container_width=True)
 
