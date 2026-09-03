@@ -954,6 +954,9 @@ def price_histogram(market_data):
 
 
     figure = px.bar(price_counts, x="Price", y="Games",title="Price Distribution Among Similar Games", labels={"Price": " Price($)", "Games": "Number of Games"})
+    figure.update_traces(hovertemplate="<b>Price:</b> $%{x:.2f}<br>" +
+                                        "<b>Number of games:</b> %{y}<extra></extra>",width=1.0
+    )
 
     figure.update_layout(
            xaxis=dict(
@@ -962,7 +965,6 @@ def price_histogram(market_data):
                )
     )
 
-    figure.update_traces(width=1.0)
     figure.update_xaxes(
         tickmode="array",
         tickvals=[4.99,9.99, 14.99, 19.99, 29.99, 39.99, 49.99, 59.99, 69.99],
