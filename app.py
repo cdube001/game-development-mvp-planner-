@@ -1157,9 +1157,10 @@ if st.button("Analyze Game Concept", type="primary"):
         )
 
         st.caption(
-            "Games most similar to your concept based on their descriptions and Steam community tags. "
-            f"Match Score weights semantic similarity ({similarity_weight}%) "
-            f"and community tag similarity ({tag_weight}%) to refine the initial ranking. "
+            "Ranks games based on semantic similarity to your concept, " \
+            "then reranks the results using their Steam community tags. "
+            f"Match Score combines semantic similarity ({similarity_weight}%) "
+            f"and community tag similarity ({tag_weight}%). "
             "Adjust these weights in the sidebar to change the emphasis."
         )
         
@@ -1189,13 +1190,13 @@ if st.button("Analyze Game Concept", type="primary"):
                         hide_index=True
                 )
         st.caption("Ranks the most engaged games among the 100 most similar games retrieved. "
-            f"The Engagement Score combines current concurrent players ({engagement_ccu_weight}%) " 
-            f"and Steam review volume ({engagement_review_weight}%) to highlight games with stronger overall player engagement. " 
+            f"Engagement Score combines current concurrent players ({engagement_ccu_weight}%) " 
+            f"and Steam review volume ({engagement_review_weight}%). Higher scores indicate stronger overall player engagement. " 
             f"Concurrent player counts are based on data updated as of {steamspy_data_updated_date}. "
             "Adjust these weights in the sidebar to change the emphasis."
         )
 
-    st.subheader("Market & Pricing Among Similar Games")
+    st.subheader("Market & Pricing")
     st.write("Summarizes the pricing of games similar to your concept to help identify the current market range.")
 
     price_histogram(market_data)
@@ -1241,9 +1242,9 @@ if st.button("Analyze Game Concept", type="primary"):
    
 
 
-    st.subheader("Common Features Across Similar Games")
+    st.subheader("Common Features")
 
-    st.caption("Shows gameplay and platform features frequently found among the games most similar to your concept.")
+    st.caption("Shows gameplay and platform features frequently found among the most similar games retrieved for your concept.")
 
     col1, col2 = st.columns([1.2, 1])
     with col1:
@@ -1297,20 +1298,17 @@ if st.button("Analyze Game Concept", type="primary"):
 
 
 
-    st.subheader("Common Community Tags:")
-    st.caption("Tags frequently associated with the games most similar to your concept.")
+    st.subheader("Common Community Tags")
+    st.caption("Shows community tags frequently associated with the games most similar to your concept.")
 
     tags_chart_data = tag_frequency.sort_values("game_frequency", ascending=False).head(15).copy()
     tags_chart_data = tags_chart_data.rename(columns={"tag_names": "Community Tags", "game_frequency": "Games"})
     st.bar_chart(tags_chart_data,x="Community Tags",y="Games", horizontal=True, sort="-Games")
 
 
-    st.subheader("Potential Gameplay Features Worth Considering")
-    # st.caption("Recommendations generated from the retrieved games and your proposed game concept.")
+    st.subheader("Potential Gameplay Features")
     st.caption(
-        "AI-generated recommendations informed by the retrieved games "
-        "and your proposed game concept. Recommendations are suggestions, "
-        "not features directly observed in every retrieved game."
+        "AI-generated gameplay recommendations informed by your game concept and the retrieved similar games. Recommendations are suggestions and are not necessarily features found in the retrieved games."
     )
     if recommendations_response is not None:
             for item in recommendations_response:
