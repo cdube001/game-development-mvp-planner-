@@ -1162,8 +1162,7 @@ if st.button("Analyze Game Concept", type="primary"):
         
     with col2:
         st.write("Most Engaged Similar Titles:")
-        st.caption("Among the 100 most similar games, these games show the strongest player engagement based on concurrent players and Steam review activity.")
-
+        
         popular_similar_games = popular_similar_games.rename(columns={
             "name": "Game",
             "ccu": "Concurrent Active Users",
