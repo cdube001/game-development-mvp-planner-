@@ -1042,16 +1042,19 @@ with st.sidebar:
     #Filters to implement weight adjustment for semantic score and tag similarity
     #Possibly incorporate popularity (recommendations as an optional filter)
     with st.expander("Adjustments", expanded=False):
-        disable_gemini = st.toggle(
-            "Disable AI Recommendations",
-            value=False
-        )
-        top_games = st.slider("Number of Games", 3,20,5)
-        similarity_weight = st.slider("Semantic Similarity Weight vs Tag Similarity Weight", 0, 100, 70)
-        engagement_ccu_weight = st.slider("Concurrent Player Weight vs Steam Review Weight", 0, 100, 40)
-        
-        engagement_review_weight = 100 - engagement_ccu_weight
-        tag_weight = 100 - similarity_weight
+        with st.form("settings_form"):
+            disable_gemini = st.toggle(
+                "Disable AI Recommendations",
+                value=False
+            )
+            top_games = st.slider("Number of Games", 3,20,5)
+            similarity_weight = st.slider("Semantic Similarity Weight vs Tag Similarity Weight", 0, 100, 70)
+            engagement_ccu_weight = st.slider("Concurrent Player Weight vs Steam Review Weight", 0, 100, 40)
+            
+            engagement_review_weight = 100 - engagement_ccu_weight
+            tag_weight = 100 - similarity_weight
+
+            apply_settings = st.form_submit_button("Apply Settings")
 
     st.write(f"Games Displayed: {top_games}")
     st.write(f"Semantic Similarity: {similarity_weight}%")
