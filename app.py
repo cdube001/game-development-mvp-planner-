@@ -1240,7 +1240,7 @@ if st.button("Analyze Game Concept", type="primary"):
         market_data["initial_price"].idxmax(), "appid"
     ]
     highest_price_game = market_data.loc[
-        market_data["initial_price"].idxmax(), "name"
+        market_data["initial_price"].idxmax(), "original_name"
     ]
     
 
