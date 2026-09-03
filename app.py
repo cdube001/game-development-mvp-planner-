@@ -1041,6 +1041,10 @@ with st.sidebar:
     #Filters to implement weight adjustment for semantic score and tag similarity
     #Possibly incorporate popularity (recommendations as an optional filter)
     with st.expander("Adjustments", expanded=False):
+        adjust_popularity = st.toggle(
+            "Adjust for Popularity",
+            value=False
+        )
         top_games = st.slider("Number of Games", 3,20,5)
         similarity_weight = st.slider("Semantic Similarity Weight vs Tag Similarity Weight", 0, 100, 70)
         engagement_ccu_weight = st.slider("Concurrent Player Weight vs Steam Review Weight", 0, 100, 40)
