@@ -663,7 +663,7 @@ def test_gemini_response():
         ]
     }
 
-def game_concept(input_text, similarity_weight, tag_weight, engagement_ccu_weight, engagement_review_weight, top_games):
+def game_concept(input_text, similarity_weight, tag_weight, engagement_ccu_weight, engagement_review_weight, top_games, disable_gemini):
 
     show_memory("Game concept START")
 
@@ -878,16 +878,17 @@ def game_concept(input_text, similarity_weight, tag_weight, engagement_ccu_weigh
 
 
     show_memory("After prompt created")
+    if not disable_gemini:
+        USE_TEST_RESPONSE = True
 
-    USE_TEST_RESPONSE = True
-
-    if USE_TEST_RESPONSE:
-        response = test_gemini_response()
+        if USE_TEST_RESPONSE:
+            response = test_gemini_response()
+        else:
+            response = generate_response_gemini(prompt)
+        show_memory("After Gemini response")   
     else:
-        response = generate_response_gemini(prompt)
-        
-            
-    show_memory("After Gemini response")
+         response = ""
+    
 
     return (
         response,
@@ -1041,7 +1042,7 @@ with st.sidebar:
     #Filters to implement weight adjustment for semantic score and tag similarity
     #Possibly incorporate popularity (recommendations as an optional filter)
     with st.expander("Adjustments", expanded=False):
-        adjust_popularity = st.toggle(
+        disable_gemini = st.toggle(
             "Disable AI Recommendations",
             value=False
         )
@@ -1094,7 +1095,8 @@ if st.button("Analyze Game Concept", type="primary"):
                 tag_weight,
                 engagement_ccu_weight,
                 engagement_review_weight,
-                top_games
+                top_games,
+                disable_gemini
 
         )
 
