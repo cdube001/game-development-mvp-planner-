@@ -1125,7 +1125,7 @@ if st.button("Analyze Game Concept", type="primary"):
     display_results = rag_results[[
                             "appid",
                             "name",
-                            "original_name"
+                            "original_name",
                             "release_year",
                             "combined_score",
                             "tag_similarity",
