@@ -1194,8 +1194,6 @@ if st.button("Analyze Game Concept", type="primary"):
 
     st.subheader("Market & Pricing Among Similar Games")
     st.write("Summarizes the pricing of games similar to your concept to help identify the current market range.")
-    price_histogram(market_data)
-
     price_data = market_summary(market_data)
     col1, col2, col3, col4  = st.columns(4)
     col1.metric(
@@ -1230,6 +1228,10 @@ if st.button("Analyze Game Concept", type="primary"):
         f'<a href="{steam_url}" target="_blank">{highest_price_game} ↗</a>',
         unsafe_allow_html=True
     )
+    
+    price_histogram(market_data)
+
+    
    
 
 
