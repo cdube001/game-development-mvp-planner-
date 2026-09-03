@@ -887,7 +887,7 @@ def game_concept(input_text, similarity_weight, tag_weight, engagement_ccu_weigh
             response = generate_response_gemini(prompt)
         show_memory("After Gemini response")   
     else:
-         response = ""
+         response = None
     
 
     return (
