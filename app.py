@@ -975,6 +975,7 @@ def price_histogram(market_data):
     )
 
     figure.update_xaxes(
+        range=[0,80],
         tickmode="array",
         tickvals=[4.99,9.99, 14.99, 19.99, 29.99, 39.99, 49.99, 59.99, 69.99],
         ticktext=["$4.99","$9.99", "$14.99","$19.99", "$29.99", "$39.99","$49.99","$59.99","$69.99"]
