@@ -933,8 +933,13 @@ def price_histogram(market_data):
             (price_data["is_free"] == 0) &
             (price_data["initial_price"] == 0),
             "Not Available",
+            # price_data["initial_price"].apply(
+            #     lambda x: f"${x:.2f}" if pd.notna(x) else "Unknown"
+            # )
             price_data["initial_price"].apply(
-                lambda x: f"${x:.2f}" if pd.notna(x) else "Unknown"
+                lambda x: "$70+" if pd.notna(x) and x >= 70
+                else f"${x:.2f}" if pd.notna(x)
+                else "Unknown"
             )
         )
     )
@@ -955,7 +960,12 @@ def price_histogram(market_data):
         ~price_counts["Price"].isin(["Free", "Not Available"])
     ].copy()
 
-    paid_data["sort_price"] = (paid_data["Price"].str.replace("$","", regex=False).astype(float))
+    # paid_data["sort_price"] = (paid_data["Price"].str.replace("$","", regex=False).astype(float))
+
+    paid_data["sort_price"] = paid_data["Price"].apply(
+        lambda x: 70 if x == "$70+"
+        else float(x.replace("$", ""))
+    )
 
     paid_data = paid_data.sort_values("sort_price")
     price_counts = pd.concat([free_data,not_available_data,paid_data])
@@ -974,12 +984,12 @@ def price_histogram(market_data):
                )
     )
 
-    figure.update_xaxes(
-        range=[0,80],
-        tickmode="array",
-        tickvals=[4.99,9.99, 14.99, 19.99, 29.99, 39.99, 49.99, 59.99, 69.99],
-        ticktext=["$4.99","$9.99", "$14.99","$19.99", "$29.99", "$39.99","$49.99","$59.99","$69.99"]
-    )
+    # figure.update_xaxes(
+    #     range=[0,80],
+    #     tickmode="array",
+    #     tickvals=[4.99,9.99, 14.99, 19.99, 29.99, 39.99, 49.99, 59.99, 69.99],
+    #     ticktext=["$4.99","$9.99", "$14.99","$19.99", "$29.99", "$39.99","$49.99","$59.99","$69.99"]
+    # )
     
 
     price_data["Pricing_Status"] = np.where(
