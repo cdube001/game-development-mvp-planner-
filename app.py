@@ -462,7 +462,7 @@ def steam_feature_frequency(df):
     retrieved_features = Steam_feature_df[Steam_feature_df['appid'].isin(df['appid'])]
 
     #ignoring Steam features since this is not a feature that is implemented by the developer
-    excluded_groups = ['platform_features']
+    excluded_groups = []#'platform_features']
 
     retrieved_features = retrieved_features[~retrieved_features['feature_group'].isin(excluded_groups)]
 
