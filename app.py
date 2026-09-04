@@ -1037,14 +1037,15 @@ def price_distribution_binned(market_data):
 
     price_data.loc[paid_mask, "Price Range"] = pd.cut(
         price_data.loc[paid_mask, "initial_price"],
-        bins=[0, 10, 20, 30, 40, 60, np.inf],
+        bins=[0, 5, 15, 30, 40, 60, 70, np.inf],
         labels=[
-            "$0–9.99",
-            "$10–19.99",
-            "$20–29.99",
+            "$0–4.99",
+            "$5–14.99",
+            "$15–29.99",
             "$30–39.99",
             "$40–59.99",
-            "$60+"
+            "$60-69.99",
+            "70+"
         ],
         right=False
     ).astype(str)
@@ -1067,12 +1068,12 @@ def price_distribution_binned(market_data):
         .reindex([
             "Free",
             "Not Available",
-            "$0–9.99",
-            "$10–19.99",
-            "$20–29.99",
+            "$0–4.99",
+            "$5–14.99",
+            "$15–29.99",
             "$30–39.99",
-            "$40–59.99",
-            "$60+"
+            "$60-69.99",
+            "70+"
         ])
         .fillna(0)
         .reset_index()
@@ -1104,12 +1105,12 @@ def price_distribution_binned(market_data):
             categoryarray=[
                 "Free",
                 "Not Available",
-                "$0–9.99",
-                "$10–19.99",
-                "$20–29.99",
+                "$0–4.99",
+                "$5–14.99",
+                "$15–29.99",
                 "$30–39.99",
-                "$40–59.99",
-                "$60+"
+                "$60-69.99",
+                "70+"
             ]
         )
     )
@@ -1121,7 +1122,7 @@ def price_distribution_binned(market_data):
 
     st.caption(
         "Shows the number of similar games within each price range. "
-        "Games priced at $60 or more are grouped together."
+        "Games priced at $70 or more are grouped together."
     ) 
 
 
