@@ -1039,8 +1039,6 @@ def price_distribution_binned(market_data):
         price_data.loc[paid_mask, "initial_price"],
         bins=[0, 5, 10, 15, 30, 40, 60, 70, np.inf],
         labels=[
-            "Free",
-            "Not Available",
             "$0–4.99",
             "$5–9.99",
             "$10–14.99",
