@@ -1037,10 +1037,11 @@ def price_distribution_binned(market_data):
 
     price_data.loc[paid_mask, "Price Range"] = pd.cut(
         price_data.loc[paid_mask, "initial_price"],
-        bins=[0, 5, 15, 30, 40, 60, 70, np.inf],
+        bins=[0, 5, 10, 15, 30, 40, 60, 70, np.inf],
         labels=[
             "$0–4.99",
-            "$5–14.99",
+            "$5–9.99",
+            "$10–14.99",
             "$15–29.99",
             "$30–39.99",
             "$40–59.99",
@@ -1066,12 +1067,12 @@ def price_distribution_binned(market_data):
         price_data["Price Range"]
         .value_counts()
         .reindex([
-            "Free",
-            "Not Available",
             "$0–4.99",
-            "$5–14.99",
+            "$5–9.99",
+            "$10–14.99",
             "$15–29.99",
             "$30–39.99",
+            "$40–59.99",
             "$60-69.99",
             "70+"
         ])
@@ -1103,12 +1104,12 @@ def price_distribution_binned(market_data):
         xaxis=dict(
             categoryorder="array",
             categoryarray=[
-                "Free",
-                "Not Available",
                 "$0–4.99",
-                "$5–14.99",
+                "$5–9.99",
+                "$10–14.99",
                 "$15–29.99",
                 "$30–39.99",
+                "$40–59.99",
                 "$60-69.99",
                 "70+"
             ]
