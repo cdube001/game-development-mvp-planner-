@@ -1012,7 +1012,115 @@ def price_histogram(market_data):
     with col2:
         st.plotly_chart(status_figure, use_container_width=True)
 
+def price_distribution_binned(market_data):
+    price_data = market_data[
+        market_data["initial_price"].notna()
+    ].copy()
 
+    # Create pricing status
+    price_data["Pricing_Status"] = np.where(
+        price_data["is_free"] == 1,
+        "Free",
+        np.where(
+            (price_data["is_free"] == 0) &
+            (price_data["coming_soon"] == 0) &
+            (price_data["initial_price"] == 0),
+            "Not Available",
+            "Paid"
+        )
+    )
+
+    # Create price ranges for paid games
+    paid_mask = price_data["Pricing_Status"] == "Paid"
+
+    price_data.loc[paid_mask, "Price Range"] = pd.cut(
+        price_data.loc[paid_mask, "initial_price"],
+        bins=[0, 10, 20, 30, 40, 60, np.inf],
+        labels=[
+            "$0–9.99",
+            "$10–19.99",
+            "$20–29.99",
+            "$30–39.99",
+            "$40–59.99",
+            "$60+"
+        ],
+        right=False
+    )
+
+    # Use pricing status for Free / Not Available
+    price_data.loc[
+        price_data["Pricing_Status"] == "Free",
+        "Price Range"
+    ] = "Free"
+
+    price_data.loc[
+        price_data["Pricing_Status"] == "Not Available",
+        "Price Range"
+    ] = "Not Available"
+
+    # Count games
+    price_counts = (
+        price_data["Price Range"]
+        .value_counts()
+        .reindex([
+            "Free",
+            "Not Available",
+            "$0–9.99",
+            "$10–19.99",
+            "$20–29.99",
+            "$30–39.99",
+            "$40–59.99",
+            "$60+"
+        ])
+        .fillna(0)
+        .reset_index()
+    )
+
+    price_counts.columns = ["Price Range", "Games"]
+
+    # Bar chart
+    figure = px.bar(
+        price_counts,
+        x="Price Range",
+        y="Games",
+        title="Price Distribution Among Similar Games",
+        labels={
+            "Price Range": "Price Range",
+            "Games": "Number of Games"
+        }
+    )
+
+    figure.update_traces(
+        hovertemplate="<b>Price Range:</b> %{x}<br>" +
+                      "<b>Number of Games:</b> %{y}<extra></extra>",
+        width=0.8
+    )
+
+    figure.update_layout(
+        xaxis=dict(
+            categoryorder="array",
+            categoryarray=[
+                "Free",
+                "Not Available",
+                "$0–9.99",
+                "$10–19.99",
+                "$20–29.99",
+                "$30–39.99",
+                "$40–59.99",
+                "$60+"
+            ]
+        )
+    )
+
+    st.plotly_chart(
+        figure,
+        use_container_width=True
+    )
+
+    st.caption(
+        "Shows the number of similar games within each price range. "
+        "Games priced at $60 or more are grouped together."
+    ) 
 
 
 def market_summary(df):
@@ -1219,8 +1327,10 @@ if st.button("Analyze Game Concept", type="primary"):
     st.subheader("Market & Pricing")
     st.write("Summarizes the pricing of games similar to your concept to help identify the current market range.")
 
-    price_histogram(market_data)
+    # price_histogram(market_data)
 
+    price_distribution_binned(market_data)
+    
     price_data = market_summary(market_data)
     col1, col2, col3, col4  = st.columns(4)
     col1.metric(
