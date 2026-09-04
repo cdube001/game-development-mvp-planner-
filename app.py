@@ -1033,6 +1033,8 @@ def price_distribution_binned(market_data):
     # Create price ranges for paid games
     paid_mask = price_data["Pricing_Status"] == "Paid"
 
+    price_data["Price Range"] = ""
+
     price_data.loc[paid_mask, "Price Range"] = pd.cut(
         price_data.loc[paid_mask, "initial_price"],
         bins=[0, 10, 20, 30, 40, 60, np.inf],
@@ -1045,7 +1047,7 @@ def price_distribution_binned(market_data):
             "$60+"
         ],
         right=False
-    )
+    ).astype(str)
 
     # Use pricing status for Free / Not Available
     price_data.loc[
