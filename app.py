@@ -1424,7 +1424,7 @@ if st.button("Analyze Game Concept", type="primary"):
                         "game_count": "Similar Games",
                         "percentage": "Frequency"
                     }
-                )
+                )[["Feature", "Similar Games"]]
 
                 st.dataframe(
                     display_data,
