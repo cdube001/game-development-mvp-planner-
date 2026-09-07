@@ -1130,6 +1130,139 @@ def price_distribution_binned(market_data):
         "Games priced at $70 or more are grouped together."
     ) 
 
+def price_distribution_binned_interactive(market_data):
+    price_data = market_data[
+        market_data["initial_price"].notna()
+    ].copy()
+
+    # Create pricing status
+    price_data["Pricing_Status"] = np.where(
+        price_data["is_free"] == 1,
+        "Free",
+        np.where(
+            (price_data["is_free"] == 0) &
+            (price_data["coming_soon"] == 0) &
+            (price_data["initial_price"] == 0),
+            "Not Available",
+            "Paid"
+        )
+    )
+
+    # Create price ranges for paid games
+    paid_mask = price_data["Pricing_Status"] == "Paid"
+
+    price_data["Price Range"] = ""
+
+    price_data.loc[paid_mask, "Price Range"] = pd.cut(
+        price_data.loc[paid_mask, "initial_price"],
+        bins=[0, 5, 10, 15, 30, 40, 60, 70, np.inf],
+        labels=[
+            "$0–4.99",
+            "$5–9.99",
+            "$10–14.99",
+            "$15–29.99",
+            "$30–39.99",
+            "$40–59.99",
+            "$60-69.99",
+            "70+"
+        ],
+        right=False
+    ).astype(str)
+
+    # Use pricing status for Free / Not Available
+    price_data.loc[
+        price_data["Pricing_Status"] == "Free",
+        "Price Range"
+    ] = "Free"
+
+    price_data.loc[
+        price_data["Pricing_Status"] == "Not Available",
+        "Price Range"
+    ] = "Not Available"
+
+    # Price range order
+    price_order = [
+        "Free",
+        "Not Available",
+        "$0–4.99",
+        "$5–9.99",
+        "$10–14.99",
+        "$15–29.99",
+        "$30–39.99",
+        "$40–59.99",
+        "$60-69.99",
+        "70+"
+    ]
+
+    # Count games
+    price_counts = (
+        price_data["Price Range"]
+        .value_counts()
+        .reindex(price_order)
+        .fillna(0)
+        .reset_index()
+    )
+
+    price_counts.columns = ["Price Range", "Games"]
+
+    # Bar chart
+    figure = px.bar(
+        price_counts,
+        x="Price Range",
+        y="Games",
+        title="Price Distribution Among Similar Games",
+        labels={
+            "Price Range": "Price Range",
+            "Games": "Number of Games"
+        }
+    )
+
+    figure.update_traces(
+        hovertemplate="<b>Price Range:</b> %{x}<br>" +
+                      "<b>Number of Games:</b> %{y}<extra></extra>",
+        width=0.8
+    )
+
+    figure.update_layout(
+        xaxis=dict(
+            categoryorder="array",
+            categoryarray=price_order
+        )
+    )
+
+    # Interactive chart
+    event = st.plotly_chart(
+        figure,
+        use_container_width=True,
+        on_select="rerun",
+        selection_mode="points",
+        key="price_distribution_interactive"
+    )
+
+    # Check if a bar was selected
+    if event.selection.points:
+
+        selected_range = event.selection.points[0]["x"]
+
+        st.subheader(
+            f"Feature Breakdown — {selected_range}"
+        )
+
+        # Filter games in selected price range
+        selected_games = price_data[
+            price_data["Price Range"] == selected_range
+        ].copy()
+
+        st.write(
+            f"{len(selected_games)} similar games "
+            f"are in the {selected_range} price range."
+        )
+
+    st.caption(
+        "Shows the number of similar games within each price range. "
+        "Click a bar to explore games within that price range. "
+        "Games priced at $70 or more are grouped together."
+    )
 
 def market_summary(df):
     market_data = {}
@@ -1337,7 +1470,7 @@ if st.button("Analyze Game Concept", type="primary"):
 
     price_histogram(market_data)
 
-    price_distribution_binned(market_data)
+    price_distribution_binned_interactive(market_data)
 
     price_data = market_summary(market_data)
     col1, col2, col3, col4  = st.columns(4)
