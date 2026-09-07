@@ -1342,6 +1342,9 @@ user_concept_input = st.text_area(
 
 show_memory("Startup")
 
+if "analysis_results" not in st.session_state:
+    st.session_state.analysis_results = None
+
 if st.button("Analyze Game Concept", type="primary"):
     concept = user_concept_input.strip()
 
@@ -1351,7 +1354,7 @@ if st.button("Analyze Game Concept", type="primary"):
 
     
     with st.spinner("Analyzing your game concept..."):
-        response, list_features, feature_group_results, tag_frequency, rag_results, market_data, popular_similar_games = game_concept(
+        st.session_state.analysis_results = game_concept(
                 [concept],
                 similarity_weight,
                 tag_weight,
@@ -1363,6 +1366,19 @@ if st.button("Analyze Game Concept", type="primary"):
         )
 
     show_memory("End game_concept")
+ #----------------DASHBOARD--------------------------------------
+    
+if st.session_state.analysis_results is not None:
+    (
+        response,
+        list_features,
+        feature_group_results,
+        tag_frequency,
+        rag_results,
+        market_data,
+        popular_similar_games
+    ) = st.session_state.analysis_results
+
     if response is not None:
         games_response = response["retrieved_similar_games"]
         characteristics_response = response["common_community_highlighted_gameplay_characteristics"]
