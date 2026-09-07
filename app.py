@@ -1595,6 +1595,10 @@ with st.sidebar:
 
             apply_settings = st.form_submit_button("Apply Settings")
 
+            if apply_settings:
+                st.session_state.analysis_results = None
+                st.rerun()
+                
     st.write(f"AI Recommendation: {disable_gemini}")
     st.write(f"Games Displayed: {top_games}")
     st.write(f"Semantic Similarity: {similarity_weight}%")
