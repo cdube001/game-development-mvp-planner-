@@ -1169,12 +1169,13 @@ def price_distribution_binned_interactive(market_data):
         right=False
     ).astype(str)
 
-    # Use pricing status for Free / Not Available
+    # Assign Free
     price_data.loc[
         price_data["Pricing_Status"] == "Free",
         "Price Range"
     ] = "Free"
 
+    # Assign Not Available
     price_data.loc[
         price_data["Pricing_Status"] == "Not Available",
         "Price Range"
@@ -1194,7 +1195,7 @@ def price_distribution_binned_interactive(market_data):
         "70+"
     ]
 
-    # Count games
+    # Count games in each price range
     price_counts = (
         price_data["Price Range"]
         .value_counts()
@@ -1203,9 +1204,12 @@ def price_distribution_binned_interactive(market_data):
         .reset_index()
     )
 
-    price_counts.columns = ["Price Range", "Games"]
+    price_counts.columns = [
+        "Price Range",
+        "Games"
+    ]
 
-    # Bar chart
+    # Create binned price chart
     figure = px.bar(
         price_counts,
         x="Price Range",
@@ -1218,8 +1222,9 @@ def price_distribution_binned_interactive(market_data):
     )
 
     figure.update_traces(
-        hovertemplate="<b>Price Range:</b> %{x}<br>" +
-                      "<b>Number of Games:</b> %{y}<extra></extra>",
+        hovertemplate=
+            "<b>Price Range:</b> %{x}<br>" +
+            "<b>Number of Games:</b> %{y}<extra></extra>",
         width=0.8
     )
 
@@ -1230,7 +1235,7 @@ def price_distribution_binned_interactive(market_data):
         )
     )
 
-    # Interactive chart
+    # Make the bin chart interactive
     event = st.plotly_chart(
         figure,
         use_container_width=True,
@@ -1239,31 +1244,90 @@ def price_distribution_binned_interactive(market_data):
         key="price_distribution_interactive"
     )
 
-    # Check if a bar was selected
+    # ---------------------------------------------------------
+    # SECOND CHART: GAMES WITHIN SELECTED PRICE RANGE
+    # ---------------------------------------------------------
+
     if event.selection.points:
 
         selected_range = event.selection.points[0]["x"]
 
-        st.subheader(
-            f"Feature Breakdown — {selected_range}"
-        )
-
-        # Filter games in selected price range
+        # Get games belonging to selected price range
         selected_games = price_data[
             price_data["Price Range"] == selected_range
         ].copy()
 
-        st.write(
-            f"{len(selected_games)} similar games "
-            f"are in the {selected_range} price range."
+        st.subheader(
+            f"Games in {selected_range}"
+        )
+
+        st.caption(
+            f"{len(selected_games)} similar games are "
+            f"in this price range."
+        )
+
+        # Handle Free / Not Available separately
+        if selected_range in ["Free", "Not Available"]:
+
+            # Give these games a value of 1 so they can
+            # still be represented in a bar chart
+            selected_games["Chart Value"] = 1
+
+            second_figure = px.bar(
+                selected_games,
+                x="original_name",
+                y="Chart Value",
+                title=f"Games in {selected_range}",
+                labels={
+                    "original_name": "Game",
+                    "Chart Value": "Games"
+                }
+            )
+
+            second_figure.update_traces(
+                hovertemplate=
+                    "<b>Game:</b> %{x}<br>" +
+                    f"<b>Status:</b> {selected_range}" +
+                    "<extra></extra>"
+            )
+
+        else:
+
+            # Sort games from lowest to highest price
+            selected_games = selected_games.sort_values(
+                "initial_price"
+            )
+
+            # Create second bar chart
+            second_figure = px.bar(
+                selected_games,
+                x="original_name",
+                y="initial_price",
+                title=f"Games in {selected_range}",
+                labels={
+                    "original_name": "Game",
+                    "initial_price": "Initial Price ($)"
+                }
+            )
+
+            second_figure.update_traces(
+                hovertemplate=
+                    "<b>Game:</b> %{x}<br>" +
+                    "<b>Price:</b> $%{y:.2f}<extra></extra>"
+            )
+
+        # Display second chart
+        st.plotly_chart(
+            second_figure,
+            use_container_width=True
         )
 
     st.caption(
         "Shows the number of similar games within each price range. "
-        "Click a bar to explore games within that price range. "
+        "Click a bar to explore the games within that price range. "
         "Games priced at $70 or more are grouped together."
     )
-
+    
 def price_histogram_interactive(market_data):
     price_data = market_data[
         market_data["initial_price"].notna()
