@@ -1261,14 +1261,6 @@ def price_distribution_binned_interactive(market_data):
             price_data["Price Range"] == selected_range
         ].copy()
 
-        st.subheader(
-            f"Games in {selected_range}"
-        )
-
-        st.caption(
-            f"Shows how the {len(selected_games)} similar games "
-            f"are distributed across individual price points."
-        )
 
         # Only show exact price points for paid games
         if selected_range not in ["Free", "Not Available"]:
@@ -1599,7 +1591,7 @@ with st.sidebar:
                 st.session_state.analysis_results = None
                 st.rerun()
 
-    st.write(f"AI Recommendation: {disable_gemini}")
+    st.write(f"AI Recommendation: {'Disabled' if disable_gemini else 'Enabled'}")
     st.write(f"Games Displayed: {top_games}")
     st.write(f"Semantic Similarity: {similarity_weight}%")
     st.write(f"Community Tags: {tag_weight}%")
