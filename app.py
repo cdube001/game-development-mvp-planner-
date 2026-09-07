@@ -887,7 +887,7 @@ def game_concept(input_text, similarity_weight, tag_weight, engagement_ccu_weigh
 
     show_memory("After prompt created")
     if not disable_gemini:
-        USE_TEST_RESPONSE = True
+        USE_TEST_RESPONSE = False
 
         if USE_TEST_RESPONSE:
             response = test_gemini_response()
