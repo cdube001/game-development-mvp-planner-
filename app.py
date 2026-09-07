@@ -1598,7 +1598,7 @@ with st.sidebar:
             if apply_settings:
                 st.session_state.analysis_results = None
                 st.rerun()
-                
+
     st.write(f"AI Recommendation: {disable_gemini}")
     st.write(f"Games Displayed: {top_games}")
     st.write(f"Semantic Similarity: {similarity_weight}%")
@@ -1770,7 +1770,7 @@ if st.session_state.analysis_results is not None:
     st.subheader("Market & Pricing")
     st.write("Summarizes the pricing of games similar to your concept to help identify the current market range.")
 
-    price_histogram_interactive(market_data)
+    # price_histogram_interactive(market_data)
 
     price_distribution_binned_interactive(market_data)
 
