@@ -1243,7 +1243,11 @@ def price_distribution_binned_interactive(market_data):
         selection_mode="points",
         key="price_distribution_interactive"
     )
-
+    st.caption(
+        "Shows the number of similar games within each price range. "
+        "Click a bar to explore the games within that price range. "
+        "Games priced at $70 or more are grouped together."
+    )
     # ---------------------------------------------------------
     # Breakdown Chart
     # ---------------------------------------------------------
@@ -1281,12 +1285,6 @@ def price_distribution_binned_interactive(market_data):
                 "Games"
             ]
 
-            # Format prices for display
-            price_point_counts["Price"] = (
-                price_point_counts["Price"]
-                .apply(lambda x: f"${x:.2f}")
-            )
-
             # Create second bar chart
             second_figure = px.bar(
                 price_point_counts,
@@ -1301,9 +1299,18 @@ def price_distribution_binned_interactive(market_data):
 
             second_figure.update_traces(
                 hovertemplate=
-                    "<b>Price:</b> %{x}<br>" +
+                    "<b>Price:</b> $%{x:.2f}<br>" +
                     "<b>Number of Games:</b> %{y}<extra></extra>",
                 width=0.8
+            )
+
+            # Make x-axis use .99 price increments
+            second_figure.update_xaxes(
+                tickmode="linear",
+                tick0=0.99,
+                dtick=1,
+                tickprefix="$",
+                tickformat=".2f"
             )
 
             st.plotly_chart(
@@ -1318,11 +1325,7 @@ def price_distribution_binned_interactive(market_data):
                 "paid price points."
             )
 
-    st.caption(
-        "Shows the number of similar games within each price range. "
-        "Click a bar to explore the games within that price range. "
-        "Games priced at $70 or more are grouped together."
-    )
+    
 
 def price_histogram_interactive(market_data):
     price_data = market_data[
