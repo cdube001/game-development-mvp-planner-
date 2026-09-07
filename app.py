@@ -1592,11 +1592,13 @@ with st.sidebar:
 
             apply_settings = st.form_submit_button("Apply Settings")
 
+    st.write(f"AI Recommendation: {disable_gemini}")
     st.write(f"Games Displayed: {top_games}")
     st.write(f"Semantic Similarity: {similarity_weight}%")
     st.write(f"Community Tags: {tag_weight}%")
     st.write(f"Concurrent Player Weight: {engagement_ccu_weight}%")
     st.write(f"Steam Review Weight : {engagement_review_weight}%")
+    
     # selected_attribute = st.selectbox("Attribute: ", 1,index=0)
 
 example_concept = (
