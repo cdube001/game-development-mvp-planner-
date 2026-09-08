@@ -565,28 +565,28 @@ def test_gemini_response():
         "retrieved_similar_games": [
             {
                 "rank": 1,
-                "game": "DOOM",
-                "score": 0.914
+                "game": "Spacepunk Survival",
+                "score": 0.82
             },
             {
                 "rank": 2,
-                "game": "ULTRAKILL",
-                "score": 0.887
+                "game": "Wandering Star",
+                "score": 0.77
             },
             {
                 "rank": 3,
-                "game": "Warhammer 40,000: Boltgun",
-                "score": 0.852
+                "game": "Distrust: Polar Survival",
+                "score": 0.70
             },
             {
                 "rank": 4,
-                "game": "Prodeus",
-                "score": 0.826
+                "game": "Osiris: New Dawn",
+                "score": 0.63
             },
             {
                 "rank": 5,
-                "game": "Turbo Overkill",
-                "score": 0.798
+                "game": "PULSAR: Lost Colony",
+                "score": 0.63
             }
         ],
 
@@ -641,20 +641,20 @@ def test_gemini_response():
 
         "potential_gameplay_features_worth_considering": [
             {
-                "recommendation": "In-Game Mod & Map Browser",
-                "details": "Consider providing an integrated browser for discovering, downloading, and sharing community-created maps."
+                "recommendation": "Role-based class system",
+                "details": "Assign distinct roles to each player (such as Engineer, Medic, or Weapons Specialist) to encourage team communication and reliance on complementary skills."
             },
             {
-                "recommendation": "Aggressive Combat-Driven Health Mechanics",
-                "details": "Consider rewarding aggressive close-range combat with health, armor, or ammunition recovery to encourage continuous momentum."
+                "recommendation": "Dynamic environment and power management",
+                "details": "Allow players to reroute power, seal breaches, and repair life support modules across the abandoned station to create tense situational choices."
             },
             {
-                "recommendation": "Asymmetric Multiplayer Modes",
-                "details": "Consider specialized multiplayer modes that give different players distinct abilities or roles."
+                "recommendation": "Procedurally generated station sectors",
+                "details": "Incorporate randomized layouts and dynamic hazard placements to increase replayability across separate playthroughs."
             },
             {
                 "recommendation": "Cross-Platform Multiplayer",
-                "details": "Consider supporting cross-platform multiplayer to increase the potential player pool for cooperative and competitive modes."
+                "details": "Provide mechanisms for players to set up defenses, turrets, and barricades in safe sectors to hold out against alien swarms before deeper pushes."
             }
         ]
     }
