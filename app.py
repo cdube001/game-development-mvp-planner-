@@ -1652,7 +1652,10 @@ if st.session_state.analysis_results is not None:
 
     st.subheader("Potential Gameplay Features")
     st.caption(
-        "AI-generated gameplay recommendations informed by your game concept and the retrieved similar games. Recommendations are suggestions and are not necessarily features found in the retrieved games."
+        f"AI-generated gameplay recommendations based on your game concept and "
+        f"the top {top_games} most similar games retrieved by the system. "
+        "Recommendations are suggestions and are not necessarily features found "
+        "in the retrieved games."
     )
     if recommendations_response is not None:
             for item in recommendations_response:
