@@ -653,7 +653,7 @@ def test_gemini_response():
                 "details": "Incorporate randomized layouts and dynamic hazard placements to increase replayability across separate playthroughs."
             },
             {
-                "recommendation": "Cross-Platform Multiplayer",
+                "recommendation": "Defensive Fortification",
                 "details": "Provide mechanisms for players to set up defenses, turrets, and barricades in safe sectors to hold out against alien swarms before deeper pushes."
             }
         ]
@@ -885,7 +885,7 @@ def game_concept(input_text, similarity_weight, tag_weight, engagement_ccu_weigh
 
     show_memory("After prompt created")
     if not disable_gemini:
-        USE_TEST_RESPONSE = False
+        USE_TEST_RESPONSE = True
 
         if USE_TEST_RESPONSE:
             response = test_gemini_response()
