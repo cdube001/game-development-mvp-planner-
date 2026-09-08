@@ -26,24 +26,22 @@ def show_memory(label):
     print(f"[RAM] {label}: {memory_mb:.1f} MB", flush=True)
 #-----------Dataset Loading-----------------------------------------------------
 #establish paths for processed and clean data
+
 # processed_path = "/content/drive/MyDrive/CS X456.02/Project Data/processed/"
 # clean_path = "/content/drive/MyDrive/CS X456.02/Project Data/clean/"
+
 processed_path = "data/processed/"
 clean_path = "data/clean/"
 hf_base_url = "https://huggingface.co/datasets/cdube001/steam-game-mvp-data/resolve/main/"
 
 show_memory("After imports")
+
 #Reading the steam store clean data
 
 Steam_Spy_df = pd.read_parquet(clean_path+"steamspy_apps_clean.parquet")
 
 show_memory("After SteamSpy")
 
-# @st.cache_data
-# def load_steam_store():
-#     return pd.read_parquet(
-#         hf_base_url + "steam_store_clean.parquet"
-#     )
 
 
 #--------------Gemini Model-----------------------------------------------------
@@ -1245,7 +1243,7 @@ def price_distribution_binned_interactive(market_data):
     )
     st.caption(
         "Shows the number of similar games within each price range. "
-        "Click a bar to explore the games within that price range. "
+        "Click a bar to explore the distribution of game prices within each price range. "
         "Games priced at $70 or more are grouped together."
     )
     # ---------------------------------------------------------
@@ -1666,4 +1664,4 @@ if st.session_state.analysis_results is not None:
 
 st.divider()
 show_memory("End dashboard")
-st.caption("MVP Tool for Game Development")
+# st.caption("MVP Tool for Game Development")
